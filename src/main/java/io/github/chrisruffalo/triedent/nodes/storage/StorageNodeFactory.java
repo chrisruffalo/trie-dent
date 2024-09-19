@@ -1,113 +1,111 @@
-package io.github.chrisruffalo.triedent.nodes;
+package io.github.chrisruffalo.triedent.nodes.storage;
 
-public class DefaultNodeFactory<TYPE> implements NodeFactory<TYPE>{
+import io.github.chrisruffalo.triedent.nodes.*;
+
+public class StorageNodeFactory<TYPE, STORAGE> extends DefaultNodeFactory<TYPE> {
 
     @Override
     public Class<?> lowerNodeType(boolean terminal) {
-        return terminal ? TerminalLowerNode.class : LowerNode.class;
+        return terminal ? StorageLowerNode.class : LowerNode.class;
     }
 
     @Override
     public Node<TYPE> createLowerNode(TYPE value, boolean terminal) {
         if (terminal) {
-            return new TerminalLowerNode<>(value);
+            return new StorageLowerNode<>(value);
         }
         return new LowerNode<>(value);
     }
 
     @Override
     public Class<?> higherNodeType(boolean terminal) {
-        return terminal ? TerminalHigherNode.class : HigherNode.class;
+        return terminal ? StorageHigherNode.class : HigherNode.class;
     }
 
     @Override
     public Node<TYPE> createHigherNode(TYPE value, boolean terminal) {
         if (terminal) {
-            return new TerminalHigherNode<>(value);
+            return new StorageHigherNode<>(value);
         }
         return new HigherNode<>(value);
     }
 
     @Override
     public Class<?> lowerHigherNodeType(boolean terminal) {
-        return terminal ? TerminalLowerHigherNode.class : LowerHigherNode.class;
+        return terminal ? StorageLowerHigherNode.class : LowerHigherNode.class;
     }
 
     @Override
     public Node<TYPE> createLowerHigherNode(TYPE value, boolean terminal) {
         if (terminal) {
-            return new TerminalLowerHigherNode<>(value);
+            return new StorageLowerHigherNode<>(value);
         }
         return new LowerHigherNode<>(value);
     }
 
     @Override
     public Class<?> valueNodeType(boolean terminal) {
-        return terminal ? TerminalValueNode.class : ValueNode.class;
+        return terminal ? StorageValueNode.class : ValueNode.class;
     }
 
     @Override
     public Node<TYPE> createValueNode(TYPE value, boolean terminal) {
         if (terminal) {
-            return new TerminalValueNode<>(value);
+            return new StorageValueNode<>(value);
         }
         return new ValueNode<>(value);
     }
 
     @Override
     public Class<?> centerNodeType(boolean terminal) {
-        return terminal ? TerminalCenterNode.class : CenterNode.class;
+        return terminal ? StorageCenterNode.class : CenterNode.class;
     }
 
     @Override
     public Node<TYPE> createCenterNode(TYPE value, boolean terminal) {
         if (terminal) {
-            return new TerminalCenterNode<>(value);
+            return new StorageCenterNode<>(value);
         }
         return new CenterNode<>(value);
     }
 
     @Override
     public Class<?> lowerCenterNodeType(boolean terminal) {
-        return terminal ? TerminalLowerCenterNode.class : LowerCenterNode.class;
+        return terminal ? StorageLowerCenterNode.class : LowerCenterNode.class;
     }
 
     @Override
     public Node<TYPE> createLowerCenterNode(TYPE value, boolean terminal) {
         if (terminal) {
-            return new TerminalLowerCenterNode<>(value);
+            return new StorageLowerCenterNode<>(value);
         }
         return new LowerCenterNode<>(value);
     }
 
     @Override
     public Class<?> centerHigherNodeType(boolean terminal) {
-        return terminal ? TerminalCenterHigherNode.class : CenterHigherNode.class;
+        return terminal ? StorageCenterHigherNode.class : CenterHigherNode.class;
     }
 
     @Override
     public Node<TYPE> createCenterHigherNode(TYPE value, boolean terminal) {
         if (terminal) {
-            return new TerminalCenterHigherNode<>(value);
+            return new StorageCenterHigherNode<>(value);
         }
         return new CenterHigherNode<>(value);
     }
 
     @Override
     public Class<?> lowerCenterHigherNodeType(boolean terminal) {
-        return terminal ? TerminalLowerCenterHigherNode.class : LowerCenterHigherNode.class;
+        return terminal ? StorageLowerCenterHigherNode.class : LowerCenterHigherNode.class;
     }
 
     @Override
     public Node<TYPE> createLowerCenterHigherNode(TYPE value, boolean terminal) {
         if (terminal) {
-            return new TerminalLowerCenterHigherNode<>(value);
+            return new StorageLowerCenterHigherNode<>(value);
         }
         return new LowerCenterHigherNode<>(value);
     }
 
-    @Override
-    public void release(Node<TYPE> node) {
-
-    }
 }

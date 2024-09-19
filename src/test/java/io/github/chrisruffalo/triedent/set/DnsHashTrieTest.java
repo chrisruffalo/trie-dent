@@ -1,6 +1,6 @@
 package io.github.chrisruffalo.triedent.set;
 
-import io.github.chrisruffalo.triedent.set.impl.DnsTrieSet;
+import io.github.chrisruffalo.triedent.set.impl.DnsHashTrie;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,11 +9,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-class DnsTrieTest extends StringSetTest {
+class DnsHashTrieTest extends StringSetTest {
 
     @Test
     void basic() {
-        final Set<String> dnsTrie = new DnsTrieSet();
+        final Set<String> dnsTrie = new DnsHashTrie();
         dnsTrie.addAll(List.of(
             "google.com",
             "netflix.com",
@@ -32,25 +32,25 @@ class DnsTrieTest extends StringSetTest {
 
     @Test
     void domains() {
-        final Set<String> dnsTrie = new DnsTrieSet();
+        final Set<String> dnsTrie = new DnsHashTrie();
         domains(dnsTrie);
     }
 
     @Test
     void torture() throws IOException {
-        final Set<String> dnsTrie = new DnsTrieSet();
+        final Set<String> dnsTrie = new DnsHashTrie();
         torture(dnsTrie);
     }
 
     @Test
     void million() throws IOException {
-        final Set<String> dnsTrie = new DnsTrieSet();
+        final Set<String> dnsTrie = new DnsHashTrie();
         million(dnsTrie);
     }
 
     @Test
     void millionCheck() throws IOException {
-        final Set<String> dnsTrie = new DnsTrieSet();
+        final Set<String> dnsTrie = new DnsHashTrie();
         millionCheck(dnsTrie);
     }
 

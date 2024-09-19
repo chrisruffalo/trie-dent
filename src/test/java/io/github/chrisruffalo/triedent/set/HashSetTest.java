@@ -8,8 +8,9 @@ import java.util.HashSet;
 class HashSetTest extends StringSetTest {
 
     @Test
-    void million() throws IOException {
-        million(new HashSet<>());
+    void millionCheck() throws IOException {
+        final HashSet<String> set = new HashSet<>();
+        millionCheck(set);
     }
 
 }

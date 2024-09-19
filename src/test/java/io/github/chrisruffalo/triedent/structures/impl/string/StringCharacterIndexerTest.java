@@ -4,8 +4,6 @@ import io.github.chrisruffalo.triedent.structures.Direction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
-
 class StringCharacterIndexerTest {
 
     @Test
@@ -33,21 +31,8 @@ class StringCharacterIndexerTest {
     @Test
     void compare() {
         final StringCharacterIndexerFactory factory = new StringCharacterIndexerFactory();
-        Assertions.assertEquals(Direction.CENTER, factory.get("a").compare(0, 'a'));
-        Assertions.assertEquals(Direction.HIGHER, factory.get("a").compare(0, 'b'));
-        Assertions.assertEquals(Direction.LOWER, factory.get("b").compare(0, 'a'));
+        Assertions.assertEquals(Direction.CENTER, factory.get("a").compare('a', 'a'));
+        Assertions.assertEquals(Direction.HIGHER, factory.get("a").compare('a', 'b'));
+        Assertions.assertEquals(Direction.LOWER, factory.get("b").compare('b', 'a'));
     }
-
-    @Test
-    void iterator() {
-        final String test = "dog dog dog";
-        final StringCharacterIndexer indexer = new StringCharacterIndexer(test);
-        final Iterator<Character> iterator = indexer.iterator();
-
-        final StringBuilder builder = new StringBuilder();
-        iterator.forEachRemaining(builder::append);
-
-        Assertions.assertEquals(test, builder.toString());
-    }
-
 }

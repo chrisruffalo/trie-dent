@@ -98,6 +98,10 @@ public interface Node<TYPE> {
         return false;
     };
 
+    default void setTerminal(boolean terminal) {
+
+    }
+
     /**
      * The root node is a special node that _can_ be terminal but that
      * cannot be transformed because of its location as a root node.

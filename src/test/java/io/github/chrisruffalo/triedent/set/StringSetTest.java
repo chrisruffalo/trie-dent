@@ -1,5 +1,8 @@
 package io.github.chrisruffalo.triedent.set;
 
+import io.github.chrisruffalo.triedent.nodes.RootNode;
+import io.github.chrisruffalo.triedent.structures.impl.Finder;
+import io.github.chrisruffalo.triedent.structures.impl.dns.DnsHashIndexer;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.BufferedReader;
@@ -8,6 +11,8 @@ import java.nio.CharBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -67,18 +72,44 @@ public abstract class StringSetTest {
     }
 
     void domains(Set<String> set) {
-        set.add("google.com");
-        set.add("google.com.br");
-        set.add("coop");
-        set.add("gunther");
-        set.add("koino.io");
-        set.add("google.br");
-        set.add("google.co");
+        List<String> list = List.of(
+  "google.com",
+            "google.co",
+            "google.com.br",
+            "google.br",
+            "youm7.com",
+            "live.com",
+            "twitter.com",
+            "sinai.com",
+            "hotmail.com",
+            "google.co.jp",
+            "mp.pl",
+            "cc5.cn",
+            "on1.com",
+            "te5.com",
+            "7y7.com",
+            "r4.com",
+            "a.com",
+            "alpha",
+            "66n.com",
+            "ht5.com",
+            "dts.com",
+            "air1.com",
+            "y0.com",
+            "w5.akamai.net",
+            "c42.qbo.intuit.com",
+            "koino.io",
+            "a.b"
+        );
+        Assertions.assertTrue(set.addAll(list));
+        Assertions.assertFalse(set.addAll(list));
+        Assertions.assertTrue(set.containsAll(list));
         Assertions.assertFalse(set.add("google.co")); // should not be able to add a second time
         Assertions.assertTrue(set.contains("google.com"));
         Assertions.assertTrue(set.contains("google.com.br"));
         Assertions.assertTrue(set.contains("koino.io"));
         Assertions.assertTrue(set.contains("google.br"));
+        Assertions.assertTrue(set.contains("a.b"));
     }
 
     void torture(Set<String> set) throws IOException {
@@ -105,18 +136,25 @@ public abstract class StringSetTest {
         }
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     void million(Set<String> set) throws IOException {
         Path millionCsvPath = Paths.get("src", "test", "resources", "top-1m.csv");
         final AtomicLong entryCount = new AtomicLong(0);
 
         try(final BufferedReader reader = Files.newBufferedReader(millionCsvPath)) {
             reader.lines().forEach(x -> {
-                final String entry = CharBuffer.wrap(x, x.indexOf(","), x.length()).toString().trim();
+                final String entry = CharBuffer.wrap(x, x.indexOf(",") + 1, x.length()).toString().trim();
                 boolean added = set.add(entry);
                 if (added) {
                     entryCount.set(entryCount.get() + 1);
                 } else {
-                    System.out.printf("domain '%s' not added (???)\n", entry);
+                    if (set instanceof TrieSet trieSet) {
+                        final RootNode<Number> root = trieSet.root;
+                        final Finder<String, Number> finder = Finder.find(root, new DnsHashIndexer(entry));
+                        if (finder.matched()) {
+                            System.out.printf("domain '%s' not added due to possible collision (???)\n", entry);
+                        }
+                    }
                 }
             });
         }
@@ -126,13 +164,25 @@ public abstract class StringSetTest {
     }
 
     void millionCheck(Set<String> set) throws IOException {
+        ZonedDateTime start = ZonedDateTime.now();
+        // load set
+        million(set);
+        ZonedDateTime end = ZonedDateTime.now();
+        System.out.printf("million insert took %dms\n", Duration.between(start, end).toMillis());
+
+        start = ZonedDateTime.now();
         Path millionCsvPath = Paths.get("src", "test", "resources", "top-1m.csv");
+        final AtomicLong entryCount = new AtomicLong(0);
         try(final BufferedReader reader = Files.newBufferedReader(millionCsvPath)) {
             reader.lines().forEach(x -> {
-                final String entry = CharBuffer.wrap(x, x.indexOf(","), x.length()).toString().trim();
-                Assertions.assertTrue(set.contains(entry), String.format("trie should contain domain: '%s'", x));
+                final String entry = CharBuffer.wrap(x, x.indexOf(",") + 1, x.length()).toString().trim();
+                Assertions.assertTrue(set.contains(entry), String.format("trie should contain domain: '%s'", entry));
+                entryCount.set(entryCount.get() + 1);
             });
         }
+        end = ZonedDateTime.now();
+        long duration = Duration.between(start, end).toMillis();
+        System.out.printf("million check took %dms (%f ms per operation)\n", duration, ((double)duration)/entryCount.get());
     }
 
 }

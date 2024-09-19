@@ -19,7 +19,7 @@ public class PoolingIndexerFactory<WHOLE, PART> implements IndexerFactory<WHOLE,
     public Indexer<WHOLE, PART> get(WHOLE whole) {
         if (!pool.isEmpty()) {
             Indexer<WHOLE, PART> first = pool.removeFirst();
-            first.refresh(whole);
+            first.update(whole);
             return first;
         }
         return delegate.get(whole);

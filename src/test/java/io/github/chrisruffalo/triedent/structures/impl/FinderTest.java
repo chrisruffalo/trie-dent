@@ -3,8 +3,8 @@ package io.github.chrisruffalo.triedent.structures.impl;
 import io.github.chrisruffalo.triedent.nodes.Node;
 import io.github.chrisruffalo.triedent.nodes.NodeConstructor;
 import io.github.chrisruffalo.triedent.nodes.RootNode;
-import io.github.chrisruffalo.triedent.structures.impl.string.StringIndexer;
-import io.github.chrisruffalo.triedent.structures.impl.string.StringIndexerFactory;
+import io.github.chrisruffalo.triedent.structures.impl.string.StringCharacterIndexer;
+import io.github.chrisruffalo.triedent.structures.impl.string.StringCharacterIndexerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,12 +16,12 @@ class FinderTest {
     void straight() {
         final String testString = "aaaaa";
 
-        final StringIndexerFactory stringIndexerFactory = new StringIndexerFactory();
-        final NodeConstructor<String, CharSequence> constructor = new NodeConstructor<>(stringIndexerFactory);
-        RootNode<CharSequence> root = constructor.build();
+        final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
+        final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
+        RootNode<Character> root = constructor.build();
         constructor.insert(root, testString);
 
-        Finder<String, CharSequence> finder = new Finder<>(stringIndexerFactory.get(testString));
+        Finder<String, Character> finder = new Finder<>(stringCharacterIndexerFactory.get(testString));
 
         // do walk
         root.walk(finder);
@@ -29,16 +29,16 @@ class FinderTest {
         // check finder
         Assertions.assertTrue(finder.matched());
 
-        finder = new Finder<>(stringIndexerFactory.get("aaaa"));
+        finder = new Finder<>(stringCharacterIndexerFactory.get("aaaa"));
         root.walk(finder);
         Assertions.assertFalse(finder.matched());
     }
 
     @Test
     void confusingPath() {
-        final StringIndexerFactory stringIndexerFactory = new StringIndexerFactory();
-        final NodeConstructor<String, CharSequence> constructor = new NodeConstructor<>(stringIndexerFactory);
-        RootNode<CharSequence> root = constructor.build();
+        final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
+        final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
+        RootNode<Character> root = constructor.build();
         constructor.insert(root, "dogs");
         constructor.insert(root, "dog");
         constructor.insert(root, "doggo");
@@ -49,29 +49,29 @@ class FinderTest {
         constructor.insert(root, "crabby");
         constructor.insert(root, "crablike");
 
-        Finder<String, CharSequence> finder = Finder.find(root, new StringIndexer("dog"));
+        Finder<String, Character> finder = Finder.find(root, new StringCharacterIndexer("dog"));
         Assertions.assertTrue(finder.matched());
 
-        finder = Finder.find(root, new StringIndexer("dogs"));
+        finder = Finder.find(root, new StringCharacterIndexer("dogs"));
         Assertions.assertTrue(finder.matched());
 
-        finder = Finder.find(root, new StringIndexer("doggo"));
+        finder = Finder.find(root, new StringCharacterIndexer("doggo"));
         Assertions.assertTrue(finder.matched());
 
-        finder = Finder.find(root, new StringIndexer("dogsgo"));
+        finder = Finder.find(root, new StringCharacterIndexer("dogsgo"));
         Assertions.assertFalse(finder.matched());
 
-        finder = Finder.find(root, new StringIndexer("dogo"));
+        finder = Finder.find(root, new StringCharacterIndexer("dogo"));
         Assertions.assertFalse(finder.matched());
 
-        finder = Finder.find(root, new StringIndexer("d"));
+        finder = Finder.find(root, new StringCharacterIndexer("d"));
         Assertions.assertFalse(finder.matched());
 
-        finder = Finder.find(root, new StringIndexer("dogss"));
+        finder = Finder.find(root, new StringCharacterIndexer("dogss"));
         Assertions.assertFalse(finder.matched());
 
-        finder = Finder.find(root, new StringIndexer("crabby"));
-        List<Node<CharSequence>> path = finder.getPath();
+        finder = Finder.find(root, new StringCharacterIndexer("crabby"));
+        List<Node<Character>> path = finder.getPath();
         Assertions.assertEquals("c", path.getFirst().getValue().toString());
         Assertions.assertEquals("y", path.getLast().getValue().toString());
     }

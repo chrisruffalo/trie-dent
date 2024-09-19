@@ -2,7 +2,7 @@ package io.github.chrisruffalo.triedent.structures.impl;
 
 import io.github.chrisruffalo.triedent.nodes.NodeConstructor;
 import io.github.chrisruffalo.triedent.nodes.RootNode;
-import io.github.chrisruffalo.triedent.structures.impl.string.StringIndexerFactory;
+import io.github.chrisruffalo.triedent.structures.impl.string.StringCharacterIndexerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,11 +11,11 @@ class LengthTest {
 
     @Test
     void getLength() {
-        final StringIndexerFactory stringIndexerFactory = new StringIndexerFactory();
-        final NodeConstructor<String, CharSequence> constructor = new NodeConstructor<>(stringIndexerFactory);
-        RootNode<CharSequence> root = constructor.build();
+        final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
+        final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
+        RootNode<Character> root = constructor.build();
 
-        Length<CharSequence> lengther = new Length<>();
+        Length<Character> lengther = new Length<>();
         root.visit(lengther);
         Assertions.assertEquals(0, lengther.getLength());
 

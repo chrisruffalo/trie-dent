@@ -3,8 +3,6 @@ package io.github.chrisruffalo.triedent.structures.impl.string;
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 
-import java.util.Iterator;
-
 public class StringCharacterIndexer implements Indexer<String, Character> {
 
     private String value;
@@ -18,7 +16,7 @@ public class StringCharacterIndexer implements Indexer<String, Character> {
     }
 
     @Override
-    public void refresh(String input) {
+    public void update(String input) {
         this.value = input;
     }
 
@@ -42,32 +40,10 @@ public class StringCharacterIndexer implements Indexer<String, Character> {
     }
 
     @Override
-    public Iterator<Character> iterator() {
-        return new Iterator<>() {
-            int currentIndex = 0;
-
-            @Override
-            public boolean hasNext() {
-                return currentIndex < length();
-            }
-
-            @Override
-            public Character next() {
-                return atIndex(currentIndex++);
-            }
-        };
-    }
-
-    @Override
     public int length() {
         return this.value == null ? 0 : this.value.length();
     }
 
-
-    @Override
-    public Direction compare(int index, Character compare) throws IllegalStateException {
-        return compare(this.atIndex(index), compare);
-    }
 
     @Override
     public Direction compare(Character base, Character compare) {

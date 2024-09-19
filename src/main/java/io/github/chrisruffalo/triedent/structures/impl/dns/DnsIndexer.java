@@ -4,40 +4,40 @@ import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class DnsIndexer implements Indexer<String, CharSequence> {
 
-    private final List<CharSequence> labels;
+    private CharSequence name;
+
+    private final List<Range> labels;
+
+    private record Range(int start, int end) {
+    }
 
     public DnsIndexer(final String name) {
         labels = new ArrayList<>(0);
-        refresh(name);
+        update(name);
     }
 
     @Override
-    public void refresh(String name) {
-        labels.clear();
-        if(!name.contains(".")) {
-            labels.add(name);
+    public void update(String name) {
+        this.name = name;
+        if (!labels.isEmpty()) {
+            this.labels.clear();
+        }
+        if (!name.contains(".")) {
+            this.labels.add(new Range(0, name.length()));
             return;
         }
         int lag = 0;
-        int index = 0;
-        while (index < name.length()) {
-            if (name.charAt(index) == '.') {
-                labels.addFirst(name.substring(lag, index).intern());
-                lag = index + 1;
+        for (int idx = 0; idx < name.length(); idx++) {
+            if (name.charAt(idx) == '.') {
+                this.labels.addFirst(new Range(lag, idx));
+                lag = idx + 1;
             }
-            index++;
         }
-        labels.addFirst(name.substring(lag).intern());
-    }
-
-    @Override
-    public List<CharSequence> parts() {
-        return Indexer.super.parts();
+        this.labels.addFirst(new Range(lag, name.length()));
     }
 
     @Override
@@ -45,7 +45,11 @@ public class DnsIndexer implements Indexer<String, CharSequence> {
         if (index < 0 || index >= labels.size()) {
             return null;
         }
-        return labels.get(index) == null ? null : labels.get(index);
+        Range range = labels.get(index);
+        if (range == null) {
+            return null;
+        }
+        return this.name.subSequence(range.start, range.end);
     }
 
     @Override
@@ -54,18 +58,8 @@ public class DnsIndexer implements Indexer<String, CharSequence> {
     }
 
     @Override
-    public Iterator<CharSequence> iterator() {
-        return labels.iterator();
-    }
-
-    @Override
     public int length() {
         return labels.size();
-    }
-
-    @Override
-    public Direction compare(int index, CharSequence compare) throws IllegalStateException {
-        return compare(this.atIndex(index), compare);
     }
 
     @Override

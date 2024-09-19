@@ -1,9 +1,5 @@
 package io.github.chrisruffalo.triedent.structures;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * This interface represents the logic that is used to break a WHOLE into
  * smaller PARTS for storage as nodes in a tree.
@@ -19,23 +15,13 @@ public interface Indexer<WHOLE, PART> {
      *
      * @param input to reset to
      */
-    void refresh(WHOLE input);
+    void update(WHOLE input);
 
     PART atIndex(int index);
 
     boolean atOrBeyondEnd(int index);
 
-    Iterator<PART> iterator();
-
-    default List<PART> parts() {
-        final List<PART> parts = new LinkedList<>();
-        iterator().forEachRemaining(parts::add);
-        return parts;
-    }
-
     int length();
-
-    Direction compare(int index, PART compare) throws IllegalStateException;
 
     /**
      * Returns the relative direction between two points of comparison. The output is given

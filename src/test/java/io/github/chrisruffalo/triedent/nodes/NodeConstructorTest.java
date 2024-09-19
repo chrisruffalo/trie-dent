@@ -3,8 +3,8 @@ package io.github.chrisruffalo.triedent.nodes;
 import io.github.chrisruffalo.triedent.structures.Collector;
 import io.github.chrisruffalo.triedent.structures.impl.Counter;
 import io.github.chrisruffalo.triedent.structures.impl.Finder;
-import io.github.chrisruffalo.triedent.structures.impl.string.StringCollector;
-import io.github.chrisruffalo.triedent.structures.impl.string.StringIndexerFactory;
+import io.github.chrisruffalo.triedent.structures.impl.string.StringCharacterCollector;
+import io.github.chrisruffalo.triedent.structures.impl.string.StringCharacterIndexerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,9 +16,9 @@ class NodeConstructorTest {
 
     @Test
     void build() {
-        final StringIndexerFactory stringIndexerFactory = new StringIndexerFactory();
-        final NodeConstructor<String, CharSequence> constructor = new NodeConstructor<>(stringIndexerFactory);
-        RootNode<CharSequence> root = constructor.build();
+        final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
+        final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
+        RootNode<Character> root = constructor.build();
         Assertions.assertTrue(constructor.insert(root, "dogs"));
         Assertions.assertTrue(constructor.insert(root, "crabs"));
         constructor.insert(root, "dog");
@@ -41,9 +41,9 @@ class NodeConstructorTest {
 
     @Test
     void triPath() {
-        final StringIndexerFactory stringIndexerFactory = new StringIndexerFactory();
-        final NodeConstructor<String, CharSequence> constructor = new NodeConstructor<>(stringIndexerFactory);
-        RootNode<CharSequence> root = constructor.build();
+        final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
+        final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
+        RootNode<Character> root = constructor.build();
         constructor.insert(root, "f");
         Assertions.assertTrue(constructor.insert(root, "a"));
         constructor.insert(root, "z");
@@ -55,9 +55,9 @@ class NodeConstructorTest {
 
     @Test
     void domains() {
-        final StringIndexerFactory stringIndexerFactory = new StringIndexerFactory();
-        final NodeConstructor<String, CharSequence> constructor = new NodeConstructor<>(stringIndexerFactory);
-        RootNode<CharSequence> root = constructor.build();
+        final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
+        final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
+        RootNode<Character> root = constructor.build();
 
         Assertions.assertTrue(constructor.insert(root, "google.com"));
         Assertions.assertTrue(constructor.insert(root, "google.c"));
@@ -66,7 +66,7 @@ class NodeConstructorTest {
         Assertions.assertTrue(constructor.insert(root,"koino.io"));
         Assertions.assertTrue(constructor.insert(root, "google.co"));
 
-        Finder<String, CharSequence> finder = Finder.find(root, stringIndexerFactory.get("google.co"));
+        Finder<String, Character> finder = Finder.find(root, stringCharacterIndexerFactory.get("google.co"));
         root.walk(finder);
         Assertions.assertTrue(finder.matched());
 
@@ -144,13 +144,13 @@ class NodeConstructorTest {
     }
 
     void test(List<String> list) {
-        final StringIndexerFactory stringIndexerFactory = new StringIndexerFactory();
-        final NodeConstructor<String, CharSequence> constructor = new NodeConstructor<>(stringIndexerFactory);
+        final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
+        final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
 
         Set<String> unique = new HashSet<>(list);
 
-        final Collector<String, CharSequence> collector = new StringCollector();
-        RootNode<CharSequence> root = constructor.build();
+        final Collector<String, Character> collector = new StringCharacterCollector();
+        RootNode<Character> root = constructor.build();
         list.forEach(x -> {
             constructor.insert(root, x);
         });
@@ -171,7 +171,7 @@ class NodeConstructorTest {
         list.forEach(values::remove);
         Assertions.assertTrue(values.isEmpty());
 
-        final Counter<CharSequence> counter = new Counter<>();
+        final Counter<Character> counter = new Counter<>();
         root.visit(counter);
         Assertions.assertEquals(unique.size(), counter.getCount());
 
