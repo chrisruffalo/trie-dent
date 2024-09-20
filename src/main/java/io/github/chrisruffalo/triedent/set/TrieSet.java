@@ -34,9 +34,7 @@ public class TrieSet<WHOLE, PART> implements Set<WHOLE> {
 
     @Override
     public int size() {
-        final Counter<PART> counter = new Counter<>();
-        this.root.visit(counter);
-        return (int)counter.getCount();
+        return (int)this.root.terminalCount();
     }
 
     @Override

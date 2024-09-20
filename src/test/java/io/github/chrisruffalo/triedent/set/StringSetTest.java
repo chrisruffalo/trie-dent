@@ -103,13 +103,13 @@ public abstract class StringSetTest {
         );
         Assertions.assertTrue(set.addAll(list));
         Assertions.assertFalse(set.addAll(list));
-        Assertions.assertTrue(set.containsAll(list));
-        Assertions.assertFalse(set.add("google.co")); // should not be able to add a second time
         Assertions.assertTrue(set.contains("google.com"));
         Assertions.assertTrue(set.contains("google.com.br"));
         Assertions.assertTrue(set.contains("koino.io"));
         Assertions.assertTrue(set.contains("google.br"));
         Assertions.assertTrue(set.contains("a.b"));
+        Assertions.assertTrue(set.containsAll(list));
+        Assertions.assertFalse(set.add("google.co")); // should not be able to add a second time
     }
 
     void torture(Set<String> set) throws IOException {

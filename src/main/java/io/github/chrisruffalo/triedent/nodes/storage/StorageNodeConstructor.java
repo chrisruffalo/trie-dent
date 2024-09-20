@@ -6,7 +6,10 @@ import io.github.chrisruffalo.triedent.nodes.RootNode;
 import io.github.chrisruffalo.triedent.nodes.base.BaseConstructor;
 import io.github.chrisruffalo.triedent.structures.IndexerFactory;
 
-public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructor {
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
+
+public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructor<WHOLE, PART> {
 
     final NodeConstructor<WHOLE, PART> internal;
 
@@ -34,16 +37,33 @@ public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructo
         return new StorageRootNode<>(null);
     }
 
+    public STORAGE insert(RootNode<PART> to, final WHOLE input, final STORAGE toStore) {
+        return this.insert(to, input, toStore, null);
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public boolean insert(RootNode<PART> to, final WHOLE input, final STORAGE toStore) {
-        return this.insert(to, input, node -> {
+    public STORAGE insert(RootNode<PART> to, final WHOLE input, final STORAGE toStore, final BiFunction<StorageNode<PART, STORAGE>, STORAGE, Boolean> preStoreCheck) {
+        final AtomicReference<STORAGE> valueRef = new AtomicReference<>();
+        this.insert(to, input, node -> {
             if(node == null) {
                 return;
             }
             if (node instanceof final StorageNode storageNode) {
-                storageNode.setStored(toStore);
+                boolean store = true;
+                if (preStoreCheck != null && storageNode.getStored() != null) {
+                    store = preStoreCheck.apply((StorageNode<PART, STORAGE>) storageNode, (STORAGE)storageNode.getStored());
+                }
+                if (store) {
+                    storageNode.setStored(toStore);
+                    valueRef.set((STORAGE)storageNode.getStored());
+                }
             }
         });
+        if (valueRef.get() != null) {
+            return valueRef.get();
+        }
+        return null;
     }
+
 
 }

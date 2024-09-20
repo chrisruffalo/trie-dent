@@ -1,13 +1,9 @@
 package io.github.chrisruffalo.triedent.set;
 
-import io.github.chrisruffalo.triedent.set.impl.DnsHashTrie;
 import io.github.chrisruffalo.triedent.set.impl.DnsHashTrieSet;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 class DnsHashTrieSetTest extends StringSetTest {
@@ -25,9 +21,12 @@ class DnsHashTrieSetTest extends StringSetTest {
     }
 
     @Test
-    void million() throws IOException {
+    void million() throws IOException, InterruptedException {
         final Set<String> dnsTrie = new DnsHashTrieSet();
         million(dnsTrie);
+        System.gc();
+        System.out.println("done");
+        Thread.sleep(30000);
     }
 
     @Test

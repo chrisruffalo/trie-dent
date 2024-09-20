@@ -8,10 +8,8 @@ import io.github.chrisruffalo.triedent.structures.Indexer;
 import io.github.chrisruffalo.triedent.structures.IndexerFactory;
 import io.github.chrisruffalo.triedent.structures.impl.Finder;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
 
@@ -29,12 +27,12 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
 
     @Override
     public int size() {
-        return this.root.collect().size();
+        return (int)this.root.terminalCount();
     }
 
     @Override
     public boolean isEmpty() {
-        return this.root.collect().isEmpty();
+        return this.size() == 0;
     }
 
     @Override
@@ -53,7 +51,21 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
 
     @Override
     public boolean containsValue(Object value) {
-        return false;
+        AtomicBoolean contains = new AtomicBoolean(false);
+        this.root.visit((node, depth) -> {
+            if (contains.get()) {
+                return false;
+            }
+            if (node.isTerminal() && node instanceof final StorageNode storageNode) {
+                boolean equals = Objects.equals(storageNode.getStored(), value);
+                if (equals) {
+                    contains.set(true);
+                    return false;
+                }
+            }
+            return true;
+        });
+        return contains.get();
     }
 
     @Override
@@ -78,10 +90,7 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
 
     @Override
     public STORAGE put(WHOLE key, STORAGE value) {
-        if(constructor.insert(root, key, value)) {
-            return value;
-        }
-        return null;
+        return constructor.insert(root, key, value);
     }
 
     @Override
@@ -91,7 +100,9 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
 
     @Override
     public void putAll(Map<? extends WHOLE, ? extends STORAGE> m) {
-
+        if (m != null) {
+            m.forEach(this::put);
+        }
     }
 
     @Override

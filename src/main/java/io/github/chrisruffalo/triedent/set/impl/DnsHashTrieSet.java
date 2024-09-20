@@ -27,6 +27,9 @@ public class DnsHashTrieSet implements Set<String> {
 
     @Override
     public boolean contains(Object o) {
+        if (!(o instanceof String)) {
+            return false;
+        }
         return internal.containsKey(o);
     }
 
@@ -57,12 +60,21 @@ public class DnsHashTrieSet implements Set<String> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        for (Object o : c) {
+            if (!this.contains(o)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean addAll(Collection<? extends String> c) {
-        return false;
+        boolean added = true;
+        for (String s : c) {
+            added = internal.put(s, s) != null && added;
+        }
+        return added;
     }
 
     @Override

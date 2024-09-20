@@ -28,6 +28,11 @@ public class DnsHashIndexerTest {
         Assertions.assertEquals(2, indexer.length());
         Assertions.assertEquals(DnsHashIndexer.hash("pl"), indexer.atIndex(0));
         Assertions.assertEquals(DnsHashIndexer.hash("mp"), indexer.atIndex(1));
+
+        indexer = hashIndexerFactory.get("a.b");
+        Assertions.assertEquals(2, indexer.length());
+        Assertions.assertEquals(DnsHashIndexer.hash("b"), indexer.atIndex(0));
+        Assertions.assertEquals(DnsHashIndexer.hash("a"), indexer.atIndex(1));
     }
 
 }

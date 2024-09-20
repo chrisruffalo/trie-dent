@@ -194,6 +194,15 @@ public interface Node<TYPE> {
     }
 
     /**
+     * Count all terminal nodes
+     *
+     * @return the count of terminal nodes, serves as the "size" of the structure, generally
+     */
+    default long terminalCount() {
+        return (isTerminal() ? 1 : 0) + (hasLower() ? getLower().terminalCount() : 0) + (hasCenter() ? getCenter().terminalCount() : 0) + (hasHigher() ? getHigher().terminalCount() : 0);
+    }
+
+    /**
      * Simple method to collect all possible paths through the tree that result
      * in something terminal. This allows the collection of values to be
      * reconstituted, by parts, via a collector that can collate them.

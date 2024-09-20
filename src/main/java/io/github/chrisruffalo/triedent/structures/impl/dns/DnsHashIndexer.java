@@ -3,6 +3,7 @@ package io.github.chrisruffalo.triedent.structures.impl.dns;
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 import org.apache.commons.codec.digest.MurmurHash2;
+import org.apache.commons.codec.digest.MurmurHash3;
 
 public class DnsHashIndexer implements Indexer<String, Number> {
 
@@ -14,8 +15,9 @@ public class DnsHashIndexer implements Indexer<String, Number> {
 
     @Override
     public void update(String input) {
+        byte[] inputBytes = input.getBytes();
         if (!input.contains(".")) {
-            hashes = new Number[]{hash(input)};
+            hashes = new Number[]{hash(inputBytes, 0, inputBytes.length)};
             return;
         }
         // count . in source
@@ -35,17 +37,21 @@ public class DnsHashIndexer implements Indexer<String, Number> {
         int lag = 0;
         for (int idx = 0; idx < input.length(); idx++) {
             if (input.charAt(idx) == '.') {
-                hashes[count--] = hash(input.substring(lag,idx));
+                hashes[count--] = hash(inputBytes, lag, idx);
                 lag = idx + 1;
             }
         }
-        if (lag < input.length() - 1) {
-            hashes[0] = hash(input.substring(lag));
+        if (lag <= input.length() - 1) {
+            hashes[0] = hash(inputBytes, lag, input.length());
         }
     }
 
+    static Number hash(byte[] input, int offset, int end) {
+        return MurmurHash3.hash32x86(input, offset, end - offset, MurmurHash3.DEFAULT_SEED);
+    }
+
     static Number hash(String input) {
-        return MurmurHash2.hash64(input);
+        return hash(input.getBytes(), 0, input.length());
     }
 
     @Override

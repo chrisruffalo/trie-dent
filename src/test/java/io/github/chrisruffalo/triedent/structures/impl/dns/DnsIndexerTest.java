@@ -17,7 +17,15 @@ class DnsIndexerTest {
         Assertions.assertEquals("alpha", indexer.atIndex(3).toString());
         Assertions.assertTrue(indexer.atOrBeyondEnd(3));
         Assertions.assertNull(indexer.atIndex(4));
+    }
 
+    @Test
+    void shortString() {
+        final DnsIndexerFactory dnsIndexerFactory = new DnsIndexerFactory();
+        final DnsIndexer indexer = dnsIndexerFactory.get("a.b");
+        Assertions.assertEquals(2, indexer.length());
+        Assertions.assertEquals("b", indexer.atIndex(0).toString());
+        Assertions.assertEquals("a", indexer.atIndex(1).toString());
     }
 
 }
