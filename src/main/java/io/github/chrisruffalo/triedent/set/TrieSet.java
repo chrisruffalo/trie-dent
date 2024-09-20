@@ -7,7 +7,6 @@ import io.github.chrisruffalo.triedent.structures.Collector;
 import io.github.chrisruffalo.triedent.structures.CollectorFactory;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 import io.github.chrisruffalo.triedent.structures.IndexerFactory;
-import io.github.chrisruffalo.triedent.structures.impl.Counter;
 import io.github.chrisruffalo.triedent.structures.impl.Finder;
 
 import java.util.*;

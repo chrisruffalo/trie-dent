@@ -2,7 +2,6 @@ package io.github.chrisruffalo.triedent.structures.impl.dns;
 
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
-import org.apache.commons.codec.digest.MurmurHash2;
 import org.apache.commons.codec.digest.MurmurHash3;
 
 public class DnsHashIndexer implements Indexer<String, Number> {

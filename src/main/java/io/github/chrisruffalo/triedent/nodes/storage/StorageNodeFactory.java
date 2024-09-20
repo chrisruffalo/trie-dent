@@ -2,7 +2,7 @@ package io.github.chrisruffalo.triedent.nodes.storage;
 
 import io.github.chrisruffalo.triedent.nodes.*;
 
-public class StorageNodeFactory<TYPE, STORAGE> extends DefaultNodeFactory<TYPE> {
+public class StorageNodeFactory<TYPE> extends DefaultNodeFactory<TYPE> {
 
     @Override
     public Class<?> lowerNodeType(boolean terminal) {

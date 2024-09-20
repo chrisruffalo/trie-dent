@@ -13,12 +13,12 @@ public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructo
 
     final NodeConstructor<WHOLE, PART> internal;
 
-    final StorageNodeFactory<PART, STORAGE> factory;
+    final NodeFactory<PART> factory;
 
     final IndexerFactory<WHOLE, PART> indexerFactory;
 
     public StorageNodeConstructor(IndexerFactory<WHOLE, PART> indexerFactory) {
-        this.factory = new StorageNodeFactory<>();
+        this.factory =  new StorageNodeFactory<>();
         this.indexerFactory = indexerFactory;
         this.internal = new NodeConstructor<>(factory, indexerFactory);
     }

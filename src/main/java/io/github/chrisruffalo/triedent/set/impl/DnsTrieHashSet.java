@@ -5,13 +5,14 @@ import io.github.chrisruffalo.triedent.structures.impl.dns.DnsHashIndexerFactory
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
-public class DnsHashTrieSet implements Set<String> {
+public class DnsTrieHashSet implements Set<String> {
 
     final TrieMap<String, Number, String> internal;
 
-    public DnsHashTrieSet() {
+    public DnsTrieHashSet() {
         internal = new TrieMap<>(new DnsHashIndexerFactory());
     }
 
@@ -50,7 +51,8 @@ public class DnsHashTrieSet implements Set<String> {
 
     @Override
     public boolean add(String s) {
-        return internal.put(s, s) != null;
+        String added = internal.put(s, s);
+        return Objects.equals(added, s);
     }
 
     @Override

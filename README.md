@@ -30,4 +30,35 @@ set.add("john");
 set.add("mary");
 set.add("steve");
 assert(set.contains("steve"));
+assert(3 == set.size());
 ```
+
+## Rationale
+As mentioned in the Abstract this repository implements a data structure that uses a novel (crazy) approach to creating
+a tree by using polymorphic elision of data fields. What the term "polymorphic elision" means in this case is that instead
+of every node being of the type Node with fields for each property each node has a distinct type depending on the structure. 
+While this does necessitate a more complex creation algorithm and result in more allocations initially the final result
+is that nodes with less mutable information take fewer bytes. A TerminalValueNode has a representation that takes 16B where
+a TerminalLowerCenterHigherNode has a representational cost of 32B. The Root node, which has a structure that would
+be required for every node if they were all the same, takes 40B to represent. In small trees this would not matter and
+is fairly detrimental to code maintainability and readability so this will only matter on large data sets.
+
+There are two different measures of memory that are important to this data structure and its use. The first is the number
+of allocations required to build the structure and the second is the retained size of the structure. The starting point
+for this approach was to reduce the retained size to the minimum and then work towards reducing allocations.
+
+## Examples
+In testing a HashSet and a DnsHashTrieSet were both loaded with 1,000,000 domain names. The HashSet is much faster than
+the DnsHashTrieSet and, as expected, also allocates less memory during creation. However, the retained size of the
+DnsHashTrieSet is about 35% of the HashSet's retained size.
+
+The `million()` method of the `HashSetTest` and `DnsTrieHashSet` was used to collect data for this comparison. A `System.gc()`
+call was made before taking a snapshot after loading the domain names. The time was measured without profiling.
+
+| Implementation | Time (ms) | Allocations (MB) | Retained (MB) |
+| - | - | - | - |
+|HashSet|372|21.38|108.98|
+|DnsHashTrieSet|2127|365.44|69.92|
+
+As you can see from the above case the DnsTrieHashSet only makes sense in the event that you can spare the allocation
+pressure for creating it and the retained size savings is worthwhile.
