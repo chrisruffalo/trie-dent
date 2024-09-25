@@ -1,6 +1,6 @@
 package io.github.chrisruffalo.triedent.structures.impl;
 
-import io.github.chrisruffalo.triedent.nodes.Node;
+import io.github.chrisruffalo.triedent.structures.nodes.Node;
 import io.github.chrisruffalo.triedent.structures.NodeVisitor;
 
 public class Counter<PART> implements NodeVisitor<PART> {

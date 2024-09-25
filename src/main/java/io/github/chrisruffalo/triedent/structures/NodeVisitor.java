@@ -1,6 +1,6 @@
 package io.github.chrisruffalo.triedent.structures;
 
-import io.github.chrisruffalo.triedent.nodes.Node;
+import io.github.chrisruffalo.triedent.structures.nodes.Node;
 
 /**
  * A visitor visits _all_ nodes in the order left, center, right. Basically

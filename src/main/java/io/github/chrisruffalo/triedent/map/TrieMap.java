@@ -1,9 +1,9 @@
 package io.github.chrisruffalo.triedent.map;
 
-import io.github.chrisruffalo.triedent.nodes.Node;
-import io.github.chrisruffalo.triedent.nodes.storage.StorageNode;
-import io.github.chrisruffalo.triedent.nodes.storage.StorageNodeConstructor;
-import io.github.chrisruffalo.triedent.nodes.storage.StorageRootNode;
+import io.github.chrisruffalo.triedent.structures.nodes.Node;
+import io.github.chrisruffalo.triedent.structures.nodes.storage.StorageNode;
+import io.github.chrisruffalo.triedent.structures.nodes.storage.StorageNodeConstructor;
+import io.github.chrisruffalo.triedent.structures.nodes.storage.StorageRootNode;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 import io.github.chrisruffalo.triedent.structures.IndexerFactory;
 import io.github.chrisruffalo.triedent.structures.impl.Finder;

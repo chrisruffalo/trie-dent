@@ -1,7 +1,7 @@
 package io.github.chrisruffalo.triedent.structures.impl;
 
-import io.github.chrisruffalo.triedent.nodes.NodeConstructor;
-import io.github.chrisruffalo.triedent.nodes.RootNode;
+import io.github.chrisruffalo.triedent.structures.nodes.NodeConstructor;
+import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 import io.github.chrisruffalo.triedent.structures.impl.string.StringCharacterIndexerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

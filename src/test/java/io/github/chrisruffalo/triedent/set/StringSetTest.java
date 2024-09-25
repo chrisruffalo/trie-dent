@@ -1,6 +1,6 @@
 package io.github.chrisruffalo.triedent.set;
 
-import io.github.chrisruffalo.triedent.nodes.RootNode;
+import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 import io.github.chrisruffalo.triedent.structures.impl.Finder;
 import io.github.chrisruffalo.triedent.structures.impl.dns.DnsHashIndexer;
 import org.junit.jupiter.api.Assertions;
@@ -101,7 +101,14 @@ public abstract class StringSetTest {
             "koino.io",
             "a.b"
         );
+        list.forEach(item -> {
+            Assertions.assertTrue(set.add(item), String.format("'%s' was not added to trie", item));
+        });
+        set.clear();
         Assertions.assertTrue(set.addAll(list));
+        list.forEach(item -> {
+            Assertions.assertFalse(set.add(item), String.format("trie does not already contain collected item: '%s'", item));
+        });
         Assertions.assertFalse(set.addAll(list));
         Assertions.assertTrue(set.contains("google.com"));
         Assertions.assertTrue(set.contains("google.com.br"));

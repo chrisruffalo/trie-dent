@@ -1,10 +1,14 @@
 package io.github.chrisruffalo.triedent.structures.impl.dns;
 
+import com.github.eprst.murmur3.MurmurHash3;
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
-import org.apache.commons.codec.digest.MurmurHash3;
+
+import java.nio.charset.StandardCharsets;
 
 public class DnsHashIndexer implements Indexer<String, Number> {
+
+    public static final int DEFAULT_SEED = 104729;
 
     private Number[] hashes;
 
@@ -14,11 +18,6 @@ public class DnsHashIndexer implements Indexer<String, Number> {
 
     @Override
     public void update(String input) {
-        byte[] inputBytes = input.getBytes();
-        if (!input.contains(".")) {
-            hashes = new Number[]{hash(inputBytes, 0, inputBytes.length)};
-            return;
-        }
         // count . in source
         int count = 0;
         for(int idx = 0; idx < input.length(); idx++) {
@@ -26,31 +25,37 @@ public class DnsHashIndexer implements Indexer<String, Number> {
                 count++;
             }
         };
-        if (input.startsWith(".")) {
+        int inputLength = input.length();
+        if (input.charAt(0) == '.') {
             count--;
         }
-        if (input.endsWith(".")) {
+        if (input.charAt(inputLength - 1) == '.') {
             count--;
+        }
+        if (count == 0) {
+            hashes = new Number[]{hash(input)};
+            return;
         }
         hashes = new Number[count + 1];
         int lag = 0;
-        for (int idx = 0; idx < input.length(); idx++) {
+        for (int idx = 0; idx < inputLength; idx++) {
             if (input.charAt(idx) == '.') {
-                hashes[count--] = hash(inputBytes, lag, idx);
+                hashes[count--] = hash(input, lag, idx);
                 lag = idx + 1;
             }
         }
-        if (lag <= input.length() - 1) {
-            hashes[0] = hash(inputBytes, lag, input.length());
+        if (lag <= inputLength - 1) {
+            hashes[0] = hash(input, lag, input.length());
         }
     }
 
-    static Number hash(byte[] input, int offset, int end) {
-        return MurmurHash3.hash32x86(input, offset, end - offset, MurmurHash3.DEFAULT_SEED);
+    static Number hash(CharSequence input, int offset, int end) {
+        long hash = MurmurHash3.murmurhash3_x86_32(input, offset, end - offset, DEFAULT_SEED);
+        return hash;
     }
 
-    static Number hash(String input) {
-        return hash(input.getBytes(), 0, input.length());
+    static Number hash(CharSequence input) {
+        return hash(input, 0, input.length());
     }
 
     @Override

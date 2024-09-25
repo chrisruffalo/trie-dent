@@ -16,7 +16,9 @@ The underlying structure is a tree that is created with only the branches and ob
 makes as little use as possible of mutable values and tries to make do with polymorphism for things like determining which 
 branches are active or if the node is terminal or not.
 
-The result is a set of implementations that _mostly_ map to the expected map/set interfaces with some caveats.
+The result is a set of implementations that _mostly_ map to the expected map/set interfaces with some caveats. This
+project is mainly intended as the backbone for a DNS storage structure to be used by [pintle](https://github.com/chrisruffalo/pintle) 
+for allow and block lists that may run into the millions of entries.
 
 ## Use
 The use is very much like a basic set:
@@ -56,9 +58,9 @@ The `million()` method of the `HashSetTest` and `DnsTrieHashSet` was used to col
 call was made before taking a snapshot after loading the domain names. The time was measured without profiling.
 
 | Implementation | Time (ms) | Allocations (MB) | Retained (MB) |
-| - | - | - | - |
-|HashSet|372|21.38|108.98|
-|DnsHashTrieSet|2127|365.44|69.92|
+| - |-----------|------------------| - |
+|HashSet| 372       | 21.38            |108.98|
+|DnsHashTrieSet| 2035      | 332.91           |69.92|
 
 As you can see from the above case the DnsTrieHashSet only makes sense in the event that you can spare the allocation
 pressure for creating it and the retained size savings is worthwhile.

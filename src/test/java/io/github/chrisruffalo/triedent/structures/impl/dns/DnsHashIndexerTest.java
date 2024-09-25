@@ -10,8 +10,8 @@ public class DnsHashIndexerTest {
     public void basic() {
         final DnsHashIndexer hashIndexer = new DnsHashIndexer("example.com");
         Assertions.assertEquals(2, hashIndexer.length());
-        Assertions.assertEquals(DnsHashIndexer.hash("com"), hashIndexer.atIndex(0));
-        Assertions.assertEquals(DnsHashIndexer.hash("example"), hashIndexer.atIndex(1));
+        Assertions.assertEquals(DnsHashIndexer.hash("com").intValue(), hashIndexer.atIndex(0).intValue());
+        Assertions.assertEquals(DnsHashIndexer.hash("example"), hashIndexer.atIndex(1), String.format("hash at index 1 '%s'='%d' does not equal '%d'", "example", DnsHashIndexer.hash("example").intValue(), hashIndexer.atIndex(1).intValue()));
         Assertions.assertFalse(hashIndexer.atOrBeyondEnd(0));
         Assertions.assertTrue(hashIndexer.atOrBeyondEnd(1));
     }

@@ -29,7 +29,7 @@ public class StringTrieMapTest {
         Assertions.assertTrue(map.containsKey("cargo"));
         Assertions.assertTrue(map.containsValue("value-dork"));
 
-        Assertions.assertEquals("value-update", map.put("c", "value-update"));
+        Assertions.assertEquals("value-c", map.put("c", "value-update"));
         Assertions.assertFalse(map.containsValue("value-c"));
     }
 

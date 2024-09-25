@@ -1,8 +1,8 @@
 package io.github.chrisruffalo.triedent.set;
 
-import io.github.chrisruffalo.triedent.nodes.NodeConstructor;
-import io.github.chrisruffalo.triedent.nodes.NodeFactory;
-import io.github.chrisruffalo.triedent.nodes.RootNode;
+import io.github.chrisruffalo.triedent.structures.nodes.NodeConstructor;
+import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
+import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 import io.github.chrisruffalo.triedent.structures.Collector;
 import io.github.chrisruffalo.triedent.structures.CollectorFactory;
 import io.github.chrisruffalo.triedent.structures.Indexer;

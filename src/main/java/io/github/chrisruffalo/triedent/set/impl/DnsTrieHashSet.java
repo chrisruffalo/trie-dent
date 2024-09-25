@@ -1,7 +1,6 @@
 package io.github.chrisruffalo.triedent.set.impl;
 
-import io.github.chrisruffalo.triedent.map.TrieMap;
-import io.github.chrisruffalo.triedent.structures.impl.dns.DnsHashIndexerFactory;
+import io.github.chrisruffalo.triedent.map.impl.DnsHashMap;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -10,10 +9,10 @@ import java.util.Set;
 
 public class DnsTrieHashSet implements Set<String> {
 
-    final TrieMap<String, Number, String> internal;
+    final DnsHashMap internal;
 
     public DnsTrieHashSet() {
-        internal = new TrieMap<>(new DnsHashIndexerFactory());
+        internal = new DnsHashMap();
     }
 
     @Override
@@ -52,7 +51,7 @@ public class DnsTrieHashSet implements Set<String> {
     @Override
     public boolean add(String s) {
         String added = internal.put(s, s);
-        return Objects.equals(added, s);
+        return !Objects.equals(added, s);
     }
 
     @Override
@@ -74,7 +73,7 @@ public class DnsTrieHashSet implements Set<String> {
     public boolean addAll(Collection<? extends String> c) {
         boolean added = true;
         for (String s : c) {
-            added = internal.put(s, s) != null && added;
+            added = this.add(s) && added;
         }
         return added;
     }

@@ -1,6 +1,6 @@
 package io.github.chrisruffalo.triedent.structures.impl;
 
-import io.github.chrisruffalo.triedent.nodes.Node;
+import io.github.chrisruffalo.triedent.structures.nodes.Node;
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 import io.github.chrisruffalo.triedent.structures.NodeWalker;
