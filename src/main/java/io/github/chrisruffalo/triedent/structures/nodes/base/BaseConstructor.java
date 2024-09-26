@@ -7,6 +7,7 @@ import io.github.chrisruffalo.triedent.structures.nodes.Node;
 import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -30,12 +31,13 @@ public abstract class BaseConstructor<WHOLE, PART> {
             }
         }
 
-        this.insert(to, indexer, 0, constructedNew, afterTerminal);
+        this.insert(true, to, indexer, 0, constructedNew, afterTerminal);
         getIndexerFactory().release(indexer); // release indexer when done, allows pooling
         return constructedNew.get();
     }
 
-    protected Node<PART> insert(Node<PART> to, final Indexer<WHOLE, PART> indexer, int index, AtomicBoolean constructedNew, Consumer<Node<PART>> afterTerminal) {
+    protected Node<PART> insert(boolean root, Node<PART> to, final Indexer<WHOLE, PART> indexer, int index, AtomicBoolean constructedNew, Consumer<Node<PART>> afterTerminal) {
+
         final PART currentValue = indexer.atIndex(index);
         // break early if no current value is available, that means we are done walking the tree
         if (currentValue == null) {
@@ -69,15 +71,15 @@ public abstract class BaseConstructor<WHOLE, PART> {
         // value of the "to" node decide which way to navigate the tree
         if (Direction.CENTER.equals(toGo)) {
             int newIndex = index + 1;
-            center = insert(center, indexer, newIndex, constructedNew, afterTerminal);
+            center = insert(false, center, indexer, newIndex, constructedNew, afterTerminal);
         } else if (Direction.HIGHER.equals(toGo)) {
-            higher = insert(higher, indexer, index, constructedNew, afterTerminal);
+            higher = insert(false, higher, indexer, index, constructedNew, afterTerminal);
             terminal = false; // in higher or lower this means we took a separate
                               // path and even though the _index_ may be the
                               // terminal index it is not this node that should
                               // be considered terminal
         } else if (Direction.LOWER.equals(toGo)) {
-            lower = insert(lower, indexer, index, constructedNew, afterTerminal);
+            lower = insert(false, lower, indexer, index, constructedNew, afterTerminal);
             terminal = false; // see above comment
         }
 
@@ -86,9 +88,12 @@ public abstract class BaseConstructor<WHOLE, PART> {
             initialClass = to.getClass();
         }
 
-        if (!to.isRoot()) {
+        if (!root) {
             to = transform(to, lower, center, higher, terminal);
         }
+
+        // after transform ensure that the created node has the same contents
+        // as it should before the transform
         to.setLower(lower);
         to.setCenter(center);
         to.setHigher(higher);
@@ -99,19 +104,19 @@ public abstract class BaseConstructor<WHOLE, PART> {
 
         // if the current node and current string are co-terminal then
         // fire the after-insert update action
-        if (terminal && to.isTerminal() && afterTerminal != null) {
+        if (terminal && afterTerminal != null && to.isTerminal()) {
             afterTerminal.accept(to);
         }
 
         return to;
     }
 
-    protected Node<PART> transform(Node<PART> current, Node<PART> lower, Node<PART> center, Node<PART> higher, boolean shouldBeTerminal) {
+    protected Node<PART> transform(Node<PART> current, Node<PART> lower, Node<PART> center, Node<PART> higher, boolean newTerminalState) {
 
         final boolean needsLower = lower != null;
         final boolean needsCenter = center != null;
         final boolean needsHigher = higher != null;
-        final boolean terminal = shouldBeTerminal || current.isTerminal();
+        final boolean terminal = current.shouldBeTerminal(newTerminalState);
 
         final PART value = current.getValue();
         if (needsCenter) {

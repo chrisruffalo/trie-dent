@@ -19,7 +19,7 @@ public interface Node<TYPE> {
         return null;
     }
 
-    default void setLower(Node<TYPE> node) {};
+    void setLower(Node<TYPE> node);
 
     /**
      * Method for determining if the lower node is present.
@@ -39,7 +39,7 @@ public interface Node<TYPE> {
         return null;
     }
 
-    default void setCenter(Node<TYPE> node) {};
+    void setCenter(Node<TYPE> node);
 
     /**
      * Method for determining if the center node is present.
@@ -60,7 +60,7 @@ public interface Node<TYPE> {
         return null;
     }
 
-    default void setHigher(Node<TYPE> node) {};
+    void setHigher(Node<TYPE> node);
 
     /**
      * Method for determining if the higher node is present.
@@ -107,6 +107,10 @@ public interface Node<TYPE> {
 
     default void setTerminal(boolean terminal) {
 
+    }
+
+    default boolean shouldBeTerminal(final boolean newTerminalState) {
+        return newTerminalState;
     }
 
     /**

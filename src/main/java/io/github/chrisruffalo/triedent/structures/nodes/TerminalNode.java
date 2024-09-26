@@ -7,4 +7,8 @@ public interface TerminalNode<TYPE> extends Node<TYPE> {
         return true;
     }
 
+    default boolean shouldBeTerminal(final boolean newTerminalState) {
+        return true;
+    }
+
 }

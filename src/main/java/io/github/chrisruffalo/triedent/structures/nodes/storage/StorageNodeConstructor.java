@@ -65,14 +65,14 @@ public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructo
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected Node<PART> transform(Node<PART> current, Node<PART> lower, Node<PART> center, Node<PART> higher, boolean shouldBeTerminal) {
+    protected Node<PART> transform(Node<PART> current, Node<PART> lower, Node<PART> center, Node<PART> higher, boolean newTerminalState) {
         // grab the stored value if it exists
         STORAGE stored = null;
         if (current instanceof StorageNode storedNode) {
             stored = (STORAGE)storedNode.getStored();
         }
         // perform the normal transform
-        final Node<PART> transformed = super.transform(current, lower, center, higher, shouldBeTerminal);
+        final Node<PART> transformed = super.transform(current, lower, center, higher, newTerminalState);
         // copy the stored value to the constructed/transformed node
         if (transformed instanceof StorageNode storageNode) {
             storageNode.setStored(stored);

@@ -21,18 +21,30 @@ project is mainly intended as the backbone for a DNS storage structure to be use
 for allow and block lists that may run into the millions of entries.
 
 ## Use
-The use is very much like a basic set:
+The use is very much like a basic set or map:
 
 ```java
 import io.github.chrisruffalo.triedent.set.TrieSet;
 import io.github.chrisruffalo.triedent.set.impl.StringTrieSet;
 
-final Set<String> set = new StringTrieSet();
-set.add("john");
-set.add("mary");
-set.add("steve");
-assert(set.contains("steve"));
-assert(3 == set.size());
+// simple example method to show how this should work
+public void example() {
+    // works as a set for the storage of unique values
+    final Set<String> set = new StringTrieSet();
+    set.add("john");
+    set.add("mary");
+    set.add("steve");
+    assert (set.contains("steve"));
+    assert (3 == set.size());
+
+    // stores strings using the trie and the value type is stored with
+    // that entry.
+    final Map<String, String> map = new StringTrieMap<String>();
+    map.put("cats", "food");
+    assert ("food".equals(map.get("cats")));
+    assert (1 == map.size());
+    assert (!map.isEmpty());
+}
 ```
 
 ## Rationale
@@ -49,7 +61,7 @@ There are two different measures of memory that are important to this data struc
 of allocations required to build the structure and the second is the retained size of the structure. The starting point
 for this approach was to reduce the retained size to the minimum and then work towards reducing allocations.
 
-## Examples
+## Performance
 In testing a HashSet and a DnsHashTrieSet were both loaded with 1,000,000 domain names. The HashSet is much faster than
 the DnsHashTrieSet and, as expected, also allocates less memory during creation. However, the retained size of the
 DnsHashTrieSet is about 35% of the HashSet's retained size.
@@ -60,7 +72,7 @@ call was made before taking a snapshot after loading the domain names. The time 
 | Implementation | Time (ms) | Allocations (MB) | Retained (MB)  |
 | - |-----------|------------------|----------------|
 |HashSet| 372       | 21.38            | 108.98         |
-|DnsHashTrieSet| 2214      | 256.85           | 69.92          |
+|DnsHashTrieSet| 2131      | 251.27           | 69.92          |
 |StringTrieSet| 2441      | 1085             | 403.22         |
 
 As you can see from the above case the DnsTrieHashSet only makes sense in the event that you can spare the allocation

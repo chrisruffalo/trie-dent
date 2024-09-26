@@ -4,6 +4,8 @@ import com.github.eprst.murmur3.MurmurHash3;
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 
+import java.util.Objects;
+
 public class DnsHashIndexer implements Indexer<String, Number> {
 
     public static final int DEFAULT_SEED = 104729;
@@ -34,7 +36,13 @@ public class DnsHashIndexer implements Indexer<String, Number> {
             hashes = new Number[]{hash(input)};
             return;
         }
-        hashes = new Number[count + 1];
+        if (hashes != null) {
+            if (count + 1 != hashes.length) {
+                hashes = new Number[count + 1];
+            }
+        } else {
+            hashes = new Number[count + 1];
+        }
         int lag = 0;
         for (int idx = 0; idx < inputLength; idx++) {
             if (input.charAt(idx) == '.') {
@@ -81,12 +89,14 @@ public class DnsHashIndexer implements Indexer<String, Number> {
         if (base == null) {
             return Direction.NONE;
         }
-        int comp = Long.compare(compare.longValue(), base.longValue());
-        if (comp < 0) {
-            return Direction.HIGHER;
-        } if (comp > 0) {
-            return Direction.LOWER;
+        if (Objects.equals(base, compare)) {
+            return Direction.CENTER;
         }
-        return Direction.CENTER;
+        // using long.compare() seems slower
+        final long ref = base.longValue() - compare.longValue();
+        if (ref < 0) {
+            return Direction.HIGHER;
+        }
+        return Direction.LOWER;
     }
 }
