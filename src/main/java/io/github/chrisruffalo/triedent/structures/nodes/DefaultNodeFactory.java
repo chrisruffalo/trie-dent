@@ -105,9 +105,4 @@ public class DefaultNodeFactory<TYPE> implements NodeFactory<TYPE>{
         }
         return new LowerCenterHigherNode<>(value);
     }
-
-    @Override
-    public void release(Node<TYPE> node) {
-
-    }
 }

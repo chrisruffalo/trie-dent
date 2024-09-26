@@ -40,10 +40,4 @@ public class LowerHigherNode<TYPE> extends ValueNode<TYPE> {
         return this.higher != null;
     }
 
-    @Override
-    public void reset() {
-        super.reset();
-        this.lower = null;
-        this.higher = null;
-    }
 }

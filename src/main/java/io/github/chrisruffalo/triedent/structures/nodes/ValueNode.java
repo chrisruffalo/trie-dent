@@ -5,7 +5,7 @@ package io.github.chrisruffalo.triedent.structures.nodes;
  *
  * @param <TYPE> to contain
  */
-public class ValueNode<TYPE> extends EmptyNode<TYPE> {
+public class ValueNode<TYPE> implements Node<TYPE> {
 
     TYPE value;
 
@@ -23,8 +23,4 @@ public class ValueNode<TYPE> extends EmptyNode<TYPE> {
         this.value = value;
     }
 
-    @Override
-    public void reset() {
-        this.value = null;
-    }
 }

@@ -6,7 +6,5 @@ public interface StorageNode<TYPE, STORED> extends TerminalNode<TYPE> {
 
     STORED getStored();
 
-    default void setStored(STORED stored) {
-        // this is a no op unless something is stored
-    }
+    void setStored(STORED stored);
 }

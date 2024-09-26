@@ -23,9 +23,4 @@ public class LowerNode<TYPE> extends ValueNode<TYPE> {
         return this.lower != null;
     }
 
-    @Override
-    public void reset() {
-        super.reset();
-        this.lower = null;
-    }
 }

@@ -23,9 +23,4 @@ public class CenterNode<TYPE> extends ValueNode<TYPE> {
         return center != null;
     }
 
-    @Override
-    public void reset() {
-        super.reset();
-        this.center = null;
-    }
 }

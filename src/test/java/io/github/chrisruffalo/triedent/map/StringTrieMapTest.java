@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-public class StringTrieMapTest {
+class StringTrieMapTest {
 
     @Test
-    public void basic() {
+    void basic() {
         Map<String, String> map = new StringTrieMap<>();
         map.put("c", "value-c");
         map.put("cat", "value-cat");
@@ -31,6 +31,46 @@ public class StringTrieMapTest {
 
         Assertions.assertEquals("value-c", map.put("c", "value-update"));
         Assertions.assertFalse(map.containsValue("value-c"));
+    }
+
+    /**
+     * Test non-ascii/non-english characters
+     */
+    @Test
+    void greek() {
+        final StringTrieMap<String> map = new StringTrieMap<>();
+        map.put("γαμμα", "αλπηα");
+        Assertions.assertEquals("αλπηα", map.put("γαμμα", "βετα"));
+        Assertions.assertEquals("βετα", map.get("γαμμα"));
+        Assertions.assertNull(map.get("gamma"));
+        Assertions.assertNull(map.put("Α", "greek")); // greek capital A (alpha)
+        Assertions.assertNull(map.put("A", "english")); // english capital A
+        Assertions.assertEquals("english", map.get("A")); // english capital A
+        Assertions.assertEquals("greek", map.get("Α")); // greek capital A (alpha)
+    }
+
+    @Test
+    void symbols() {
+        final StringTrieMap<String> map = new StringTrieMap<>();
+        map.put(".", "one");
+        map.put(".?", "two");
+        map.put("\\", "three");
+        map.put("..", "four");
+        map.put(".\\.\\?.", "five");
+
+        Assertions.assertEquals("one", map.get("."));
+        Assertions.assertEquals("two", map.get(".?"));
+        Assertions.assertEquals("three", map.get("\\"));
+        Assertions.assertEquals("four", map.get(".."));
+        Assertions.assertEquals("five", map.get(".\\.\\?."));
+
+        Assertions.assertTrue(map.containsKey("."));
+        Assertions.assertTrue(map.containsKey(".?"));
+        Assertions.assertTrue(map.containsKey("\\"));
+        Assertions.assertTrue(map.containsKey(".."));
+        Assertions.assertTrue(map.containsKey(".\\.\\?."));
+        Assertions.assertFalse(map.containsKey("?"));
+        Assertions.assertFalse(map.containsKey("?."));
     }
 
 }

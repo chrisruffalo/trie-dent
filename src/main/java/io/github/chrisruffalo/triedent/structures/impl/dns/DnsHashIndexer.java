@@ -4,8 +4,6 @@ import com.github.eprst.murmur3.MurmurHash3;
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 
-import java.nio.charset.StandardCharsets;
-
 public class DnsHashIndexer implements Indexer<String, Number> {
 
     public static final int DEFAULT_SEED = 104729;
@@ -50,8 +48,7 @@ public class DnsHashIndexer implements Indexer<String, Number> {
     }
 
     static Number hash(CharSequence input, int offset, int end) {
-        long hash = MurmurHash3.murmurhash3_x86_32(input, offset, end - offset, DEFAULT_SEED);
-        return hash;
+        return (long) MurmurHash3.murmurhash3_x86_32(input, offset, end - offset, DEFAULT_SEED);
     }
 
     static Number hash(CharSequence input) {

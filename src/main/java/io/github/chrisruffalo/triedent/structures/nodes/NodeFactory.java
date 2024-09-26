@@ -34,5 +34,4 @@ public interface NodeFactory<TYPE> {
 
     Node<TYPE> createLowerCenterHigherNode(TYPE value, boolean terminal);
 
-    void release(Node<TYPE> node);
 }

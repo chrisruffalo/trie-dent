@@ -15,7 +15,9 @@ public interface Node<TYPE> {
      *
      * @return the node containing the lower value starting point
      */
-    Node<TYPE> getLower();
+    default Node<TYPE> getLower() {
+        return null;
+    }
 
     default void setLower(Node<TYPE> node) {};
 
@@ -24,14 +26,18 @@ public interface Node<TYPE> {
      *
      * @return true if there is an existing lower node
      */
-    boolean hasLower();
+    default boolean hasLower() {
+        return false;
+    }
 
     /**
      * If present get the (center) descendent of this node.
      *
      * @return the node containing the direct descendent
      */
-    Node<TYPE> getCenter();
+    default Node<TYPE> getCenter() {
+        return null;
+    }
 
     default void setCenter(Node<TYPE> node) {};
 
@@ -40,7 +46,9 @@ public interface Node<TYPE> {
      *
      * @return true if there is an existing center node
      */
-    boolean hasCenter();
+    default boolean hasCenter() {
+        return false;
+    }
 
     /**
      * If present, get the higher (right) value with
@@ -48,7 +56,9 @@ public interface Node<TYPE> {
      *
      * @return the node containing the higher value starting point
      */
-    Node<TYPE> getHigher();
+    default Node<TYPE> getHigher() {
+        return null;
+    }
 
     default void setHigher(Node<TYPE> node) {};
 
@@ -57,7 +67,9 @@ public interface Node<TYPE> {
      *
      * @return true if there is an existing higher node
      */
-    boolean hasHigher();
+    default boolean hasHigher() {
+        return false;
+    }
 
     /**
      * Get the value contained by this node
@@ -69,11 +81,6 @@ public interface Node<TYPE> {
     default void setValue(TYPE value) {
         // only value-bearing nodes can do this
     }
-
-    /**
-     * Remove any values that are currently set on the node.
-     */
-    void reset();
 
     /**
      * Returns "true" if the current node will allow a search

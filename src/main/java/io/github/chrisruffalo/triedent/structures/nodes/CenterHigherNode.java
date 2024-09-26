@@ -22,10 +22,4 @@ public class CenterHigherNode<TYPE> extends CenterNode<TYPE> {
     public boolean hasHigher() {
         return this.higher != null;
     }
-
-    @Override
-    public void reset() {
-        super.reset();
-        this.higher = null;
-    }
 }

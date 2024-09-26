@@ -23,9 +23,4 @@ public class LowerCenterNode<TYPE> extends CenterNode<TYPE> {
         return lower != null;
     }
 
-    @Override
-    public void reset() {
-        super.reset();
-        this.lower = null;
-    }
 }

@@ -24,5 +24,7 @@ class CounterTest {
         root.visit(counter);
 
         Assertions.assertEquals(4, counter.getCount());
+        counter.reset();
+        Assertions.assertEquals(0, counter.getCount());
     }
 }

@@ -26,5 +26,15 @@ class StringTrieSetTest extends StringSetTest {
         this.torture(trie);
     }
 
+    @Test
+    void million() throws Exception {
+        final Set<String> trie = new StringTrieSet();
+        this.million(trie);
+        // enable the following to get time for a heap dump
+//        System.gc();
+//        System.out.println("done");
+//        Thread.sleep(30000);
+    }
+
 }
 

@@ -1,11 +1,11 @@
 package io.github.chrisruffalo.triedent.structures.nodes.base;
 
-import io.github.chrisruffalo.triedent.structures.nodes.Node;
-import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
-import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 import io.github.chrisruffalo.triedent.structures.IndexerFactory;
+import io.github.chrisruffalo.triedent.structures.nodes.Node;
+import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
+import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -20,6 +20,16 @@ public abstract class BaseConstructor<WHOLE, PART> {
     protected boolean insert(RootNode<PART> to, final WHOLE input, Consumer<Node<PART>> afterTerminal) {
         final Indexer<WHOLE, PART> indexer = getIndexerFactory().get(input);
         final AtomicBoolean constructedNew = new AtomicBoolean(false);
+
+        // handle root node value/consideration here and remove it
+        // from the path of each insert recursion
+        if (to.getValue() == null) {
+            to.setValue(indexer.atIndex(0));
+            if (indexer.atOrBeyondEnd(0)) {
+                to.setTerminal(true);
+            }
+        }
+
         this.insert(to, indexer, 0, constructedNew, afterTerminal);
         getIndexerFactory().release(indexer); // release indexer when done, allows pooling
         return constructedNew.get();
@@ -34,39 +44,41 @@ public abstract class BaseConstructor<WHOLE, PART> {
 
         boolean terminal = indexer.atOrBeyondEnd(index);
 
-        if (to == null) {
-            getNodeFactory().release(to);
-            to = getNodeFactory().createValueNode(currentValue, terminal);
-            constructedNew.compareAndSet(false, true);
-        }
+        Node<PART> lower;
+        Node<PART> center;
+        Node<PART> higher;
 
-        if (to instanceof RootNode<PART> root && to.getValue() == null) {
-            root.setValue(currentValue);
+        final Direction toGo;
+        if (to == null) {
+            to = getNodeFactory().createValueNode(currentValue, terminal);
             if (terminal) {
                 constructedNew.compareAndSet(false, true);
-                return root;
             }
+            toGo = Direction.CENTER;
+            lower = null;
+            center = null;
+            higher = null;
+        } else {
+            toGo = indexer.compare(to.getValue(), currentValue);
+            lower = to.getLower();
+            center = to.getCenter();
+            higher = to.getHigher();
         }
 
-        Node<PART> lower = to.getLower();
-        Node<PART> center = to.getCenter();
-        Node<PART> higher = to.getHigher();
-
-        // compare current value to decide which way to go
-        final Direction toGo = indexer.compare(to.getValue(), currentValue);
+        // based on the path between the current value in the indexer and the current
+        // value of the "to" node decide which way to navigate the tree
         if (Direction.CENTER.equals(toGo)) {
             int newIndex = index + 1;
             center = insert(center, indexer, newIndex, constructedNew, afterTerminal);
         } else if (Direction.HIGHER.equals(toGo)) {
             higher = insert(higher, indexer, index, constructedNew, afterTerminal);
-            if (higher != null) {
-                terminal = false;
-            }
+            terminal = false; // in higher or lower this means we took a separate
+                              // path and even though the _index_ may be the
+                              // terminal index it is not this node that should
+                              // be considered terminal
         } else if (Direction.LOWER.equals(toGo)) {
             lower = insert(lower, indexer, index, constructedNew, afterTerminal);
-            if (lower != null) {
-                terminal = false;
-            }
+            terminal = false; // see above comment
         }
 
         Class<?> initialClass = null;
@@ -74,7 +86,12 @@ public abstract class BaseConstructor<WHOLE, PART> {
             initialClass = to.getClass();
         }
 
-        to = transform(to, lower, center, higher, terminal);
+        if (!to.isRoot()) {
+            to = transform(to, lower, center, higher, terminal);
+        }
+        to.setLower(lower);
+        to.setCenter(center);
+        to.setHigher(higher);
 
         if (terminal && !to.getClass().equals(initialClass)) {
             constructedNew.compareAndSet(false, true);
@@ -94,25 +111,7 @@ public abstract class BaseConstructor<WHOLE, PART> {
         final boolean needsLower = lower != null;
         final boolean needsCenter = center != null;
         final boolean needsHigher = higher != null;
-        final boolean terminal = current.isTerminal() || shouldBeTerminal;
-
-        // Update the node only if the transformation is required
-        if (shouldBeTerminal == current.isTerminal() && current.hasLower() == needsLower && current.hasCenter() == needsCenter && current.hasHigher() == needsHigher) {
-            current.setLower(lower);
-            current.setCenter(center);
-            current.setHigher(higher);
-            return current;
-        }
-
-        if (current.isRoot()) {
-            if (shouldBeTerminal) {
-                current.setTerminal(true);
-            }
-            current.setLower(lower);
-            current.setCenter(center);
-            current.setHigher(higher);
-            return current;
-        }
+        final boolean terminal = shouldBeTerminal || current.isTerminal();
 
         final PART value = current.getValue();
         if (needsCenter) {
@@ -137,16 +136,11 @@ public abstract class BaseConstructor<WHOLE, PART> {
             }
         }
 
-        // Set children to the node
-        current.setLower(lower);
-        current.setCenter(center);
-        current.setHigher(higher);
         return current;
     }
 
     private Node<PART> guard(Node<PART> instance, Class<?> desired, Supplier<Node<PART>> supplier) {
         if (instance == null || !instance.getClass().equals(desired)) {
-            getNodeFactory().release(instance);
             return supplier.get();
         }
         return instance;
