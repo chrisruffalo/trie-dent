@@ -21,12 +21,19 @@ public class StorageNodeConstructorTest {
         constructor.insert(root, "alert", "alert-value");
         constructor.insert(root, "abacus", "abacus-value");
         constructor.insert(root, "alpaca", "alpaca-value");
-        Finder<String, Character> finder = Finder.find(root, stringCharacterIndexerFactory.get("alpha"));
 
+        Finder<String, Character> finder = Finder.find(root, stringCharacterIndexerFactory.get("alpha"));
         Node<Character> node = finder.getPath().getLast();
         Assertions.assertInstanceOf(StorageNode.class, node);
         StorageNode<Character, String> storageNode = (StorageNode<Character, String>) node;
         Assertions.assertEquals("alpha-value", storageNode.getStored());
+
+        finder = Finder.find(root, stringCharacterIndexerFactory.get("abacus"));
+        Assertions.assertTrue(finder.matched());
+
+        constructor.remove(root, "abacus", null);
+        finder = Finder.find(root, stringCharacterIndexerFactory.get("abacus"));
+        Assertions.assertFalse(finder.matched());
     }
 
 }

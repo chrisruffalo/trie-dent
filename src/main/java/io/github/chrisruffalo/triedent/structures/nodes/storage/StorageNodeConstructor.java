@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructor<WHOLE, PART> {
 
@@ -72,16 +73,29 @@ public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructo
         return value;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public boolean remove(RootNode<PART> from, final WHOLE input, Consumer<Node<PART>> afterRemove) {
+        return super.remove(from, input, node -> {
+            if (node instanceof StorageNode storageNode) {
+                storageNode.setStored(null);
+            }
+
+            if (afterRemove != null) {
+                afterRemove.accept(node);
+            }
+        });
+    }
+
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected Node<PART> transform(Node<PART> current, Node<PART> lower, Node<PART> center, Node<PART> higher, boolean newTerminalState) {
+    protected Node<PART> insertTransform(Node<PART> current, Node<PART> lower, Node<PART> center, Node<PART> higher, boolean newTerminalState) {
         // grab the stored value if it exists
         STORAGE stored = null;
         if (current instanceof StorageNode storedNode) {
             stored = (STORAGE)storedNode.getStored();
         }
         // perform the normal transform
-        final Node<PART> transformed = super.transform(current, lower, center, higher, newTerminalState);
+        final Node<PART> transformed = super.insertTransform(current, lower, center, higher, newTerminalState);
         // copy the stored value to the constructed/transformed node
         if (transformed instanceof StorageNode storageNode) {
             storageNode.setStored(stored);

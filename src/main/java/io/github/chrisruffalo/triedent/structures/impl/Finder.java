@@ -14,6 +14,8 @@ public class Finder<WHOLE, PART> implements NodeWalker<PART> {
 
     final List<Node<PART>> path = new LinkedList<>();
 
+    final List<Node<PART>> visited = new LinkedList<>();
+
     boolean tracking = false;
 
     int index = 0;
@@ -33,6 +35,7 @@ public class Finder<WHOLE, PART> implements NodeWalker<PART> {
 
         PART valueAt = this.indexer.atIndex(index);
         PART currentNodeValue = current.getValue();
+        visited.add(current);
         boolean terminal = indexer.atOrBeyondEnd(index);
 
         // find the direction in the tree
@@ -65,13 +68,25 @@ public class Finder<WHOLE, PART> implements NodeWalker<PART> {
     }
 
     /**
-     * Get the path of nodes that led to the match.
-     * This could be useful for operations like traversing, removal, or updating (or debugging)
+     * Get the path of nodes that led to the match. Should
+     * allow the original value (or parts) to be reconstructed
+     * by following it back.
+     *
+     *
      * @return the list of nodes forming the path
      */
     public List<Node<PART>> getPath() {
         return this.path;
     }
+
+    /**
+     * This is the path of all nodes visited during the
+     * walk regardless of if they are part of the output
+     * terminal value.
+     *
+     * @return all visited nodes
+     */
+    public List<Node<PART>> getVisited() { return this.visited; }
 
     public static <WHOLE, PART> Finder<WHOLE, PART> find(Node<PART> partNode, Indexer<WHOLE, PART> indexer) {
         final Finder<WHOLE, PART> finder = new Finder<>(indexer);

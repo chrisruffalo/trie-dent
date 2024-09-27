@@ -143,6 +143,20 @@ class NodeConstructorTest {
         ));
     }
 
+    @Test
+    void remove() {
+        final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
+        final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
+        final RootNode<Character> root = constructor.build();
+
+        constructor.insert(root, "dog");
+        constructor.insert(root, "cat");
+        Assertions.assertEquals(2, root.terminalCount());
+
+        constructor.remove(root, "cat", null);
+        Assertions.assertEquals(1, root.terminalCount());
+    }
+
     void test(List<String> list) {
         final StringCharacterIndexerFactory stringCharacterIndexerFactory = new StringCharacterIndexerFactory();
         final NodeConstructor<String, Character> constructor = new NodeConstructor<>(stringCharacterIndexerFactory);
@@ -175,7 +189,13 @@ class NodeConstructorTest {
         root.visit(counter);
         Assertions.assertEquals(unique.size(), counter.getCount());
 
-        // not going to calculate this but it should always be > 0
-        Assertions.assertTrue(0 < root.nodeCount());
+        // not going to calculate this but it should always be >= the number of terminal values (the list size)
+        Assertions.assertTrue(unique.size() < root.nodeCount());
+
+        unique.forEach(item -> {
+           Assertions.assertTrue(constructor.remove(root, item, Assertions::assertNotNull), String.format("was unable to remove the word '%s'", item));
+           Assertions.assertFalse(constructor.remove(root, item, null));
+        });
+        Assertions.assertEquals(0, root.terminalCount());
     }
 }
