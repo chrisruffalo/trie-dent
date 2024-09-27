@@ -1,12 +1,14 @@
 package io.github.chrisruffalo.triedent.structures.nodes.storage;
 
+import io.github.chrisruffalo.triedent.structures.IndexerFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.Node;
 import io.github.chrisruffalo.triedent.structures.nodes.NodeConstructor;
 import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 import io.github.chrisruffalo.triedent.structures.nodes.base.BaseConstructor;
-import io.github.chrisruffalo.triedent.structures.IndexerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
@@ -17,6 +19,8 @@ public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructo
     final NodeFactory<PART> factory;
 
     final IndexerFactory<WHOLE, PART> indexerFactory;
+
+    final List<AtomicReference<STORAGE>> referencePool = new ArrayList<>(1);
 
     public StorageNodeConstructor(IndexerFactory<WHOLE, PART> indexerFactory) {
         this.factory =  new StorageNodeFactory<>();
@@ -44,7 +48,7 @@ public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructo
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public STORAGE insert(RootNode<PART> to, final WHOLE input, final STORAGE toStore, final BiFunction<StorageNode<PART, STORAGE>, STORAGE, Boolean> preStoreCheck) {
-        final AtomicReference<STORAGE> valueRef = new AtomicReference<>();
+        final AtomicReference<STORAGE> valueRef = referencePool.isEmpty() ? new AtomicReference<>() : referencePool.removeFirst();
         this.insert(to, input, node -> {
             if(node == null) {
                 return;
@@ -60,7 +64,12 @@ public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructo
                 }
             }
         });
-        return valueRef.get();
+        final STORAGE value = valueRef.get();
+        if (referencePool.size() < 10) {
+            valueRef.set(null);
+            referencePool.addLast(valueRef);
+        }
+        return value;
     }
 
     @Override

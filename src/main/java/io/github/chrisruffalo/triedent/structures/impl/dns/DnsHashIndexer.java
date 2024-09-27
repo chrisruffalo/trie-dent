@@ -4,13 +4,13 @@ import com.github.eprst.murmur3.MurmurHash3;
 import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 
-import java.util.Objects;
-
 public class DnsHashIndexer implements Indexer<String, Number> {
 
     public static final int DEFAULT_SEED = 104729;
 
     private Number[] hashes;
+
+    private int length;
 
     public DnsHashIndexer(final String name) {
         update(name);
@@ -33,15 +33,14 @@ public class DnsHashIndexer implements Indexer<String, Number> {
             count--;
         }
         if (count == 0) {
+            length = 0;
             hashes = new Number[]{hash(input)};
             return;
-        }
-        if (hashes != null) {
-            if (count + 1 != hashes.length) {
-                hashes = new Number[count + 1];
-            }
         } else {
-            hashes = new Number[count + 1];
+            length = count + 1;
+        }
+        if (hashes == null || hashes.length < length) {
+            hashes = new Number[length];
         }
         int lag = 0;
         for (int idx = 0; idx < inputLength; idx++) {
@@ -65,7 +64,7 @@ public class DnsHashIndexer implements Indexer<String, Number> {
 
     @Override
     public Number atIndex(int index) {
-        if (index < 0 || index >= hashes.length) {
+        if (index < 0 || index >= length) {
             return null;
         }
         return hashes[index];
@@ -73,12 +72,12 @@ public class DnsHashIndexer implements Indexer<String, Number> {
 
     @Override
     public boolean atOrBeyondEnd(int index) {
-        return index >= hashes.length - 1;
+        return index >= length - 1;
     }
 
     @Override
     public int length() {
-        return hashes.length;
+        return length;
     }
 
     @Override
@@ -89,14 +88,13 @@ public class DnsHashIndexer implements Indexer<String, Number> {
         if (base == null) {
             return Direction.NONE;
         }
-        if (Objects.equals(base, compare)) {
-            return Direction.CENTER;
-        }
         // using long.compare() seems slower
         final long ref = base.longValue() - compare.longValue();
         if (ref < 0) {
             return Direction.HIGHER;
+        } else if (ref > 0) {
+            return Direction.LOWER;
         }
-        return Direction.LOWER;
+        return Direction.CENTER;
     }
 }

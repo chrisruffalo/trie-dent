@@ -72,8 +72,8 @@ call was made before taking a snapshot after loading the domain names. The time 
 | Implementation | Time (ms) | Allocations (MB) | Retained (MB)  |
 | - |-----------|------------------|----------------|
 |HashSet| 372       | 21.38            | 108.98         |
-|DnsHashTrieSet| 2131      | 251.27           | 69.92          |
-|StringTrieSet| 2441      | 1085             | 403.22         |
+|DnsHashTrieSet| 2136      | 183.12           | 69.92          |
+|StringTrieSet| 1895      | 484.22           | 403.22         |
 
 As you can see from the above case the DnsTrieHashSet only makes sense in the event that you can spare the allocation
 pressure for creating it and the retained size savings is worthwhile.

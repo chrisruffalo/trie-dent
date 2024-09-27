@@ -1,5 +1,6 @@
 package io.github.chrisruffalo.triedent.set.impl;
 
+import io.github.chrisruffalo.triedent.structures.impl.PoolingIndexerFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.DefaultNodeFactory;
 import io.github.chrisruffalo.triedent.set.TrieSet;
 import io.github.chrisruffalo.triedent.structures.impl.dns.DnsHashCollectorFactory;
@@ -10,7 +11,7 @@ public class DnsHashTrie extends TrieSet<String, Number> {
     public DnsHashTrie() {
         super(
             new DnsHashCollectorFactory(),
-            new DnsHashIndexerFactory(),
+            new PoolingIndexerFactory<>(new DnsHashIndexerFactory()),
             new DefaultNodeFactory<>()
         );
     }

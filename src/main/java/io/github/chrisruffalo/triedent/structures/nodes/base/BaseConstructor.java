@@ -7,6 +7,8 @@ import io.github.chrisruffalo.triedent.structures.nodes.Node;
 import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -18,9 +20,11 @@ public abstract class BaseConstructor<WHOLE, PART> {
 
     public abstract IndexerFactory<WHOLE, PART> getIndexerFactory();
 
+    final List<AtomicBoolean> pooledBooleans = new ArrayList<>(1);
+
     protected boolean insert(RootNode<PART> to, final WHOLE input, Consumer<Node<PART>> afterTerminal) {
         final Indexer<WHOLE, PART> indexer = getIndexerFactory().get(input);
-        final AtomicBoolean constructedNew = new AtomicBoolean(false);
+        final AtomicBoolean constructedNew = pooledBooleans.isEmpty() ? new AtomicBoolean(false) : pooledBooleans.getFirst();
 
         // handle root node value/consideration here and remove it
         // from the path of each insert recursion
@@ -33,7 +37,14 @@ public abstract class BaseConstructor<WHOLE, PART> {
 
         this.insert(true, to, indexer, 0, constructedNew, afterTerminal);
         getIndexerFactory().release(indexer); // release indexer when done, allows pooling
-        return constructedNew.get();
+
+        final boolean constructed = constructedNew.get();
+        if (pooledBooleans.size() < 10) {
+            constructedNew.set(false);
+            pooledBooleans.addLast(constructedNew);
+        }
+
+        return constructed;
     }
 
     protected Node<PART> insert(boolean root, Node<PART> to, final Indexer<WHOLE, PART> indexer, int index, AtomicBoolean constructedNew, Consumer<Node<PART>> afterTerminal) {
