@@ -101,22 +101,16 @@ public abstract class StringSetTest {
             "koino.io",
             "a.b"
         );
-        list.forEach(item -> {
-            Assertions.assertTrue(set.add(item), String.format("'%s' was not added to trie", item));
-        });
-        set.clear();
-        Assertions.assertTrue(set.addAll(list));
-        list.forEach(item -> {
-            Assertions.assertFalse(set.add(item), String.format("trie does not already contain collected item: '%s'", item));
-        });
-        Assertions.assertFalse(set.addAll(list));
-        Assertions.assertTrue(set.contains("google.com"));
-        Assertions.assertTrue(set.contains("google.com.br"));
-        Assertions.assertTrue(set.contains("koino.io"));
-        Assertions.assertTrue(set.contains("google.br"));
-        Assertions.assertTrue(set.contains("a.b"));
-        Assertions.assertTrue(set.containsAll(list));
-        Assertions.assertFalse(set.add("google.co")); // should not be able to add a second time
+        Assertions.assertAll(
+            () -> list.forEach(item -> Assertions.assertTrue(set.add(item), String.format("'%s' was not added to trie", item))),
+            () -> { set.clear(); Assertions.assertTrue(set.isEmpty(), "trie set was not empty after clear"); },
+            () -> Assertions.assertTrue(set.addAll(list), "could not add all to list"),
+            () -> list.forEach(item -> Assertions.assertTrue(set.contains(item), String.format("trie does not contain inserted item: '%s'", item))),
+            () -> Assertions.assertTrue(set.containsAll(list), "set does not contain entire original list"),
+            () -> list.forEach(item -> Assertions.assertFalse(set.add(item), String.format("trie added item to the list: '%s'", item))),
+            () -> Assertions.assertFalse(set.addAll(list), "could add all to list a second time (should not be able to)"),
+            () -> Assertions.assertFalse(set.add("google.co"), "could add google.co a second time to the list") // should not be able to add a second time
+        );
     }
 
     void torture(Set<String> set) throws IOException {

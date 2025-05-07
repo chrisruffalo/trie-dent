@@ -1,13 +1,14 @@
 package io.github.chrisruffalo.triedent.set;
 
-import io.github.chrisruffalo.triedent.structures.nodes.NodeConstructor;
-import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
-import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 import io.github.chrisruffalo.triedent.structures.Collector;
 import io.github.chrisruffalo.triedent.structures.CollectorFactory;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 import io.github.chrisruffalo.triedent.structures.IndexerFactory;
 import io.github.chrisruffalo.triedent.structures.impl.Finder;
+import io.github.chrisruffalo.triedent.structures.impl.FinderFactory;
+import io.github.chrisruffalo.triedent.structures.nodes.NodeConstructor;
+import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
+import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 
 import java.util.*;
 
@@ -22,6 +23,8 @@ public class TrieSet<WHOLE, PART> implements Set<WHOLE> {
     final NodeFactory<PART> nodeFactory;
 
     final CollectorFactory<WHOLE, PART> collectorFactory;
+
+    final FinderFactory<WHOLE, PART> finderFactory = new FinderFactory<>();
 
     public TrieSet(CollectorFactory<WHOLE, PART> collectorFactory, IndexerFactory<WHOLE, PART> indexerFactory, NodeFactory<PART> nodeFactory) {
         this.indexerFactory = indexerFactory;
@@ -44,14 +47,17 @@ public class TrieSet<WHOLE, PART> implements Set<WHOLE> {
     @Override
     @SuppressWarnings("unchecked")
     public boolean contains(Object o) {
+        Finder<WHOLE, PART> finder = null;
         try {
             WHOLE x = (WHOLE)o;
             Indexer<WHOLE, PART> indexer = indexerFactory.get(x);
-            final Finder<WHOLE, PART> finder = Finder.find(root, indexer);
+            finder = finderFactory.find(root, indexer);
             indexerFactory.release(indexer);
             return finder.matched();
         } catch (ClassCastException ex) {
             return false;
+        } finally {
+            finderFactory.release(finder);
         }
     }
 

@@ -4,6 +4,7 @@ import io.github.chrisruffalo.triedent.structures.Direction;
 import io.github.chrisruffalo.triedent.structures.Indexer;
 import io.github.chrisruffalo.triedent.structures.IndexerFactory;
 import io.github.chrisruffalo.triedent.structures.impl.Finder;
+import io.github.chrisruffalo.triedent.structures.impl.FinderFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.Node;
 import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
@@ -22,6 +23,8 @@ public abstract class BaseConstructor<WHOLE, PART> {
     public abstract IndexerFactory<WHOLE, PART> getIndexerFactory();
 
     final List<AtomicBoolean> pooledBooleans = new ArrayList<>(1);
+
+    private final FinderFactory<WHOLE, PART> finderFactory = new FinderFactory<>();
 
     protected boolean insert(RootNode<PART> to, final WHOLE input, Consumer<Node<PART>> afterTerminal) {
         final Indexer<WHOLE, PART> indexer = getIndexerFactory().get(input);
@@ -125,44 +128,48 @@ public abstract class BaseConstructor<WHOLE, PART> {
 
     public boolean remove(RootNode<PART> from, final WHOLE input, Consumer<Node<PART>> afterRemove) {
         final Indexer<WHOLE, PART> indexer = getIndexerFactory().get(input);
-        final Finder<WHOLE, PART> finder = Finder.find(from, indexer);
-        if (finder.matched()) {
-            final Node<PART> target = finder.getVisited().removeLast();
+        final Finder<WHOLE, PART> finder = finderFactory.find(from, indexer);
+        try {
+            if (finder.matched()) {
+                final Node<PART> target = finder.getVisited().removeLast();
 
-            // this means that the first visited node (the root node) is the terminal node being removed
-            if (finder.getVisited().isEmpty()) {
-                if (target instanceof RootNode<PART> root && root.isTerminal()) {
-                    root.setTerminal(false);
-                    if (afterRemove != null) {
-                        afterRemove.accept(target);
+                // this means that the first visited node (the root node) is the terminal node being removed
+                if (finder.getVisited().isEmpty()) {
+                    if (target instanceof RootNode<PART> root && root.isTerminal()) {
+                        root.setTerminal(false);
+                        if (afterRemove != null) {
+                            afterRemove.accept(target);
+                        }
+                        return true;
                     }
-                    return true;
+                    return false;
                 }
-                return false;
-            }
 
-            final Node<PART> parent = finder.getVisited().removeLast();
-            final Node<PART> transformed = transform(target, target.getLower(), target.getCenter(), target.getHigher(), false);
-            transformed.setLower(target.getLower());
-            transformed.setCenter(target.getCenter());
-            transformed.setHigher(target.getHigher());
+                final Node<PART> parent = finder.getVisited().removeLast();
+                final Node<PART> transformed = transform(target, target.getLower(), target.getCenter(), target.getHigher(), false);
+                transformed.setLower(target.getLower());
+                transformed.setCenter(target.getCenter());
+                transformed.setHigher(target.getHigher());
 
-            // determine which is which using strict instance equality.
-            // (the == is _intended_ because we want the same _instance_ not the same _value_)
-            if (parent.getHigher() == target) {
-                parent.setHigher(transformed);
-            } else if (parent.getCenter() == target) {
-                parent.setCenter(transformed);
-            } else if (parent.getLower() == target) {
-                parent.setLower(transformed);
-            }
+                // determine which is which using strict instance equality.
+                // (the == is _intended_ because we want the same _instance_ not the same _value_)
+                if (parent.getHigher() == target) {
+                    parent.setHigher(transformed);
+                } else if (parent.getCenter() == target) {
+                    parent.setCenter(transformed);
+                } else if (parent.getLower() == target) {
+                    parent.setLower(transformed);
+                }
 
-            if (afterRemove != null) {
-                afterRemove.accept(target);
+                if (afterRemove != null) {
+                    afterRemove.accept(target);
+                }
+                return true;
             }
-            return true;
+            return false;
+        } finally {
+            finderFactory.release(finder);
         }
-        return false;
     }
 
     protected Node<PART> insertTransform(Node<PART> current, Node<PART> lower, Node<PART> center, Node<PART> higher, boolean newTerminalState) {

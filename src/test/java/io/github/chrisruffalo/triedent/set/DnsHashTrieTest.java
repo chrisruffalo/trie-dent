@@ -43,9 +43,13 @@ class DnsHashTrieTest extends StringSetTest {
     }
 
     @Test
-    void million() throws IOException {
+    void million() throws IOException, InterruptedException {
         final Set<String> dnsTrie = new DnsHashTrie();
         million(dnsTrie);
+        // enable the following to get time for a heap dump
+        //System.gc();
+        //System.out.println("done");
+        //Thread.sleep(30000);
     }
 
     @Test

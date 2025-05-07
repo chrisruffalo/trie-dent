@@ -5,9 +5,11 @@ import io.github.chrisruffalo.triedent.structures.CollectorFactory;
 
 public class DnsCollectorFactory implements CollectorFactory<String, CharSequence> {
 
+    static final DnsCollector SHARED = new DnsCollector();
+
     @Override
     public Collector<String, CharSequence> build() {
-        return new DnsCollector();
+        return SHARED;
     }
 
 }

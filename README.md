@@ -67,13 +67,14 @@ the DnsHashTrieSet and, as expected, also allocates less memory during creation.
 DnsHashTrieSet is about 35% of the HashSet's retained size.
 
 The `million()` method of the `HashSetTest`, `StringTrieSetTest`, and `DnsTrieHashSetTest` was used to collect data for this comparison. A `System.gc()`
-call was made before taking a snapshot after loading the domain names. The time was measured without profiling.
+call was made before taking a snapshot after loading the domain names. The "Allocation Size" was taken from the ".add()" method in the call tree. 
+The times were measured separately without profiling.
 
-| Implementation | Time (ms) | Allocations (MB) | Retained (MB)  |
-| - |-----------|------------------|----------------|
-|HashSet| 372       | 21.38            | 108.98         |
-|DnsHashTrieSet| 2136      | 183.12           | 69.92          |
-|StringTrieSet| 1895      | 484.22           | 403.22         |
+| Implementation | Time (ms) | Allocations (MB) | Retained (MB) |
+| - |-----------|------------------|---------------|
+|HashSet| 372       | 19.74            | 108.98        |
+|DnsHashTrieSet| 1767      | 161.44           | 45.65         |
+|StringTrieSet| 2182      | 1200             | 393.3         |
 
 As you can see from the above case the DnsTrieHashSet only makes sense in the event that you can spare the allocation
 pressure for creating it and the retained size savings is worthwhile.

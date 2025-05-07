@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Finder<WHOLE, PART> implements NodeWalker<PART> {
 
-    final Indexer<WHOLE, PART> indexer;
+    Indexer<WHOLE, PART> indexer;
 
     final List<Node<PART>> path = new LinkedList<>();
 
@@ -24,6 +24,19 @@ public class Finder<WHOLE, PART> implements NodeWalker<PART> {
 
     public Finder(Indexer<WHOLE, PART> indexer) {
         this.indexer = indexer;
+    }
+
+    public void setIndexer(Indexer<WHOLE, PART> indexer) {
+        this.indexer = indexer;
+    }
+
+    public void clear() {
+        indexer = null;
+        path.clear();
+        visited.clear();
+        tracking = false;
+        index = 0;
+        matched = false;
     }
 
     @Override

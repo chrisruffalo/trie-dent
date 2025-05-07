@@ -1,12 +1,13 @@
 package io.github.chrisruffalo.triedent.map;
 
+import io.github.chrisruffalo.triedent.structures.Indexer;
+import io.github.chrisruffalo.triedent.structures.IndexerFactory;
+import io.github.chrisruffalo.triedent.structures.impl.Finder;
+import io.github.chrisruffalo.triedent.structures.impl.FinderFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.Node;
 import io.github.chrisruffalo.triedent.structures.nodes.storage.StorageNode;
 import io.github.chrisruffalo.triedent.structures.nodes.storage.StorageNodeConstructor;
 import io.github.chrisruffalo.triedent.structures.nodes.storage.StorageRootNode;
-import io.github.chrisruffalo.triedent.structures.Indexer;
-import io.github.chrisruffalo.triedent.structures.IndexerFactory;
-import io.github.chrisruffalo.triedent.structures.impl.Finder;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,6 +17,8 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
     final IndexerFactory<WHOLE, PART> indexerFactory;
 
     final StorageNodeConstructor<STORAGE, WHOLE, PART> constructor;
+
+    final FinderFactory<WHOLE, PART> finderFactory = new FinderFactory<>();
 
     StorageRootNode<PART, STORAGE> root;
 
@@ -38,14 +41,17 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
     @Override
     @SuppressWarnings("unchecked")
     public boolean containsKey(Object key) {
+        Finder<WHOLE, PART> finder = null;
         try {
             WHOLE x = (WHOLE)key;
             Indexer<WHOLE, PART> indexer = indexerFactory.get(x);
-            final Finder<WHOLE, PART> finder = Finder.find(root, indexer);
+            finder = finderFactory.find(root, indexer);
             indexerFactory.release(indexer);
             return finder.matched();
         } catch (ClassCastException ex) {
             throw new RuntimeException(ex);
+        } finally {
+            finderFactory.release(finder);
         }
     }
 
@@ -71,10 +77,11 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public STORAGE get(Object key) {
+        Finder<WHOLE, PART> finder = null;
         try {
             WHOLE x = (WHOLE)key;
             Indexer<WHOLE, PART> indexer = indexerFactory.get(x);
-            final Finder<WHOLE, PART> finder = Finder.find(root, indexer);
+            finder = finderFactory.find(root, indexer);
             indexerFactory.release(indexer);
             if (finder.matched()) {
                 final Node<PART> part = finder.getPath().getLast();
@@ -84,6 +91,8 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
             }
         } catch (ClassCastException ex) {
             throw new RuntimeException(ex);
+        } finally {
+            finderFactory.release(finder);
         }
         return null;
     }

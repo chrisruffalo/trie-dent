@@ -33,7 +33,7 @@ public class DnsHashIndexer implements Indexer<String, Number> {
             count--;
         }
         if (count == 0) {
-            length = 0;
+            length = 1;
             hashes = new Number[]{hash(input)};
             return;
         } else {
