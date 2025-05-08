@@ -85,7 +85,7 @@ public class TrieSet<WHOLE, PART> implements Set<WHOLE> {
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        return constructor.remove(root, (WHOLE)o, null);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class TrieSet<WHOLE, PART> implements Set<WHOLE> {
     @Override
     @SuppressWarnings("unchecked")
     public boolean retainAll(Collection<?> c) {
-        List<WHOLE> found = c.stream()
+        final List<WHOLE> found = c.stream()
             .map(x -> {
                 try {
                     return (WHOLE)x;

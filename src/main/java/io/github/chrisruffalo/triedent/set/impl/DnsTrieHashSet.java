@@ -2,10 +2,7 @@ package io.github.chrisruffalo.triedent.set.impl;
 
 import io.github.chrisruffalo.triedent.map.impl.DnsHashMap;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class DnsTrieHashSet implements Set<String> {
 
@@ -56,7 +53,7 @@ public class DnsTrieHashSet implements Set<String> {
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        return this.internal.remove(o) != null;
     }
 
     @Override
@@ -73,19 +70,35 @@ public class DnsTrieHashSet implements Set<String> {
     public boolean addAll(Collection<? extends String> c) {
         boolean added = true;
         for (String s : c) {
-            added = this.add(s) && added;
+            added = added && this.add(s);
         }
         return added;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        final List<String> found = c.stream()
+                .map(x -> {
+                    try {
+                        return (String)x;
+                    } catch (Exception ex) {
+                        return null;
+                    }})
+                .filter(Objects::nonNull)
+                .filter(this::contains).toList();
+        boolean all = found.size() == c.size();
+        this.clear();
+        this.addAll(found);
+        return all;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        boolean removed = true;
+        for (Object o : c) {
+            removed = removed && this.remove(o);
+        }
+        return removed;
     }
 
     @Override

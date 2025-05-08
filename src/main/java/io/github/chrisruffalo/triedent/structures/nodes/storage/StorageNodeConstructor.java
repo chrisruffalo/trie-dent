@@ -77,10 +77,11 @@ public class StorageNodeConstructor<STORAGE, WHOLE, PART> extends BaseConstructo
     public boolean remove(RootNode<PART> from, final WHOLE input, Consumer<Node<PART>> afterRemove) {
         return super.remove(from, input, node -> {
             if (node instanceof StorageNode storageNode) {
+                if (afterRemove != null) {
+                    afterRemove.accept(node);
+                }
                 storageNode.setStored(null);
-            }
-
-            if (afterRemove != null) {
+            } else if (afterRemove != null) {
                 afterRemove.accept(node);
             }
         });

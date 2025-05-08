@@ -11,6 +11,7 @@ import io.github.chrisruffalo.triedent.structures.nodes.storage.StorageRootNode;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
 
@@ -104,7 +105,13 @@ public class TrieMap<WHOLE, PART, STORAGE> implements Map<WHOLE, STORAGE> {
 
     @Override
     public STORAGE remove(Object key) {
-        return null;
+        final AtomicReference<STORAGE> foundValue = new AtomicReference<>();
+        constructor.remove(root, (WHOLE)key, node -> {
+            if (node instanceof final StorageNode storageNode) {
+                foundValue.set((STORAGE) storageNode.getStored());
+            }
+        });
+        return foundValue.get();
     }
 
     @Override

@@ -9,9 +9,8 @@ import io.github.chrisruffalo.triedent.structures.nodes.Node;
 import io.github.chrisruffalo.triedent.structures.nodes.NodeFactory;
 import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -22,13 +21,13 @@ public abstract class BaseConstructor<WHOLE, PART> {
 
     public abstract IndexerFactory<WHOLE, PART> getIndexerFactory();
 
-    final List<AtomicBoolean> pooledBooleans = new ArrayList<>(1);
+    final Queue<AtomicBoolean> pooledBooleans = new ConcurrentLinkedQueue<>();
 
     private final FinderFactory<WHOLE, PART> finderFactory = new FinderFactory<>();
 
     protected boolean insert(RootNode<PART> to, final WHOLE input, Consumer<Node<PART>> afterTerminal) {
         final Indexer<WHOLE, PART> indexer = getIndexerFactory().get(input);
-        final AtomicBoolean constructedNew = pooledBooleans.isEmpty() ? new AtomicBoolean(false) : pooledBooleans.removeFirst();
+        final AtomicBoolean constructedNew = pooledBooleans.isEmpty() ? new AtomicBoolean(false) : pooledBooleans.poll();
 
         // handle root node value/consideration here and remove it
         // from the path of each insert recursion
@@ -45,7 +44,7 @@ public abstract class BaseConstructor<WHOLE, PART> {
         final boolean constructed = constructedNew.get();
         if (pooledBooleans.size() < 10) {
             constructedNew.set(false);
-            pooledBooleans.addLast(constructedNew);
+            pooledBooleans.add(constructedNew);
         }
 
         return constructed;

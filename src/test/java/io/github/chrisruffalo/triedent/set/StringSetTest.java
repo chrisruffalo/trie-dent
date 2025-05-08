@@ -1,8 +1,8 @@
 package io.github.chrisruffalo.triedent.set;
 
-import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 import io.github.chrisruffalo.triedent.structures.impl.Finder;
 import io.github.chrisruffalo.triedent.structures.impl.dns.DnsHashIndexer;
+import io.github.chrisruffalo.triedent.structures.nodes.RootNode;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.BufferedReader;
@@ -109,7 +109,15 @@ public abstract class StringSetTest {
             () -> Assertions.assertTrue(set.containsAll(list), "set does not contain entire original list"),
             () -> list.forEach(item -> Assertions.assertFalse(set.add(item), String.format("trie added item to the list: '%s'", item))),
             () -> Assertions.assertFalse(set.addAll(list), "could add all to list a second time (should not be able to)"),
-            () -> Assertions.assertFalse(set.add("google.co"), "could add google.co a second time to the list") // should not be able to add a second time
+            () -> Assertions.assertFalse(set.add("google.co"), "could not add google.co a second time to the list"), // should not be able to add a second time
+            () -> Assertions.assertTrue(set.add("other.com"), "could not add other.com a second time to the list"),
+            () -> Assertions.assertTrue(set.add("second.com"), "could not add second.com a second time to the list"),
+            () -> Assertions.assertTrue(set.retainAll(list)),
+            () -> Assertions.assertTrue(set.containsAll(list), "set does not contain entire original list after retain"),
+            () -> Assertions.assertFalse(set.contains("other.com"), "set should not contain other.com after retain"),
+            () -> Assertions.assertFalse(set.contains("second.com"), "set should not contain second.com after retain"),
+            () -> Assertions.assertTrue(set.remove("a.b"), "should be able to remove a.b from the set"),
+            () -> Assertions.assertFalse(set.remove("a.b"), "should not be able to remove a.b a second time")
         );
     }
 

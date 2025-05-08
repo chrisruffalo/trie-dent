@@ -2,6 +2,7 @@ package io.github.chrisruffalo.triedent.perf;
 
 
 import io.github.chrisruffalo.triedent.set.impl.DnsHashTrie;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -61,6 +62,7 @@ public class DnsHashTrieContainsPerfTest {
     }
 
     @Test
+    @Disabled("only used during benchmark runs")
     public void benchmark() throws Exception {
         String[] argv = {
             "DnsHashTrieContainsPerfTest.contains",
